@@ -3,582 +3,163 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Monochrome — B&W Video Studio</title>
+<title>VOIDFRAME — Abstract Video Studio</title>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080808;--s1:#111;--s2:#1a1a1a;--s3:#222;
+  --b1:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.12);--b3:rgba(255,255,255,0.22);
+  --txt:#f0f0f0;--muted:#666;--dim:#444;
+  --r:10px;--rs:6px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column;overflow:hidden;height:100vh}
+
+/* HEADER */
+header{padding:14px 24px;border-bottom:0.5px solid var(--b2);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:24px;height:24px;position:relative}
+.logo-mark svg{width:24px;height:24px}
+.logo-name{font-size:13px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#fff}
+.logo-sub{font-size:10px;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-left:6px}
+.header-right{display:flex;align-items:center;gap:8px}
+.pill{font-size:10px;padding:3px 8px;border-radius:20px;background:var(--s2);border:0.5px solid var(--b2);color:var(--muted);letter-spacing:0.05em;text-transform:uppercase}
+
+/* LAYOUT */
+.main{flex:1;display:grid;grid-template-columns:1fr 300px;overflow:hidden;min-height:0}
+
+/* PREVIEW */
+.preview{display:flex;flex-direction:column;padding:20px;gap:14px;overflow:hidden;min-height:0}
+.drop-zone{flex:1;border:1px dashed var(--b2);border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer;transition:border-color .2s,background .2s;background:var(--s1);min-height:0}
+.drop-zone:hover,.drop-zone.over{border-color:var(--b3);background:var(--s2)}
+.dz-icon{width:48px;height:48px;border-radius:50%;background:var(--s2);border:0.5px solid var(--b2);display:flex;align-items:center;justify-content:center}
+.dz-icon svg{width:20px;height:20px;stroke:var(--muted);fill:none;stroke-width:1.5}
+.dz-title{font-size:14px;font-weight:500;color:var(--txt)}
+.dz-sub{font-size:12px;color:var(--muted)}
+.dz-btn{padding:7px 18px;border-radius:var(--rs);background:var(--s2);border:0.5px solid var(--b2);color:var(--txt);font-size:12px;font-weight:500;cursor:pointer;transition:background .15s}
+.dz-btn:hover{background:var(--s3)}
+#fileInput{display:none}
+
+.video-area{flex:1;position:relative;background:#000;border-radius:var(--r);overflow:hidden;min-height:0;display:none}
+#srcVideo{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}
+#cvs{width:100%;height:100%;display:block;object-fit:contain}
+.vcontrols{position:absolute;bottom:0;left:0;right:0;padding:10px 14px;background:rgba(0,0,0,0.6);display:flex;align-items:center;gap:10px;border-top:0.5px solid rgba(255,255,255,0.06)}
+.vbtn{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.1);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+.vbtn:hover{background:rgba(255,255,255,0.2)}
+.vbtn svg{width:14px;height:14px;fill:#fff}
+.pbar{flex:1;height:3px;background:rgba(255,255,255,0.12);border-radius:2px;cursor:pointer}
+.pfill{height:100%;background:#fff;border-radius:2px;width:0%;pointer-events:none;transition:width .05s}
+.tlbl{font-size:11px;color:rgba(255,255,255,0.5);font-variant-numeric:tabular-nums;flex-shrink:0}
+
+/* PANEL */
+.panel{border-left:0.5px solid var(--b1);overflow-y:auto;padding:0}
+.panel::-webkit-scrollbar{width:3px}
+.panel::-webkit-scrollbar-thumb{background:var(--s3)}
+
+.sect{padding:16px 18px;border-bottom:0.5px solid var(--b1)}
+.sect-title{font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+
+/* EFFECTS GRID */
+.fx-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.fx-card{border:0.5px solid var(--b1);border-radius:var(--rs);padding:9px 10px;cursor:pointer;transition:all .15s;background:var(--s1);position:relative}
+.fx-card:hover{border-color:var(--b2);background:var(--s2)}
+.fx-card.active{border-color:rgba(255,255,255,0.35);background:var(--s2)}
+.fx-card.active::before{content:'';position:absolute;top:7px;right:7px;width:5px;height:5px;border-radius:50%;background:#fff}
+.fx-name{font-size:11px;font-weight:600;color:var(--txt);margin-bottom:2px}
+.fx-desc{font-size:10px;color:var(--dim);line-height:1.4}
+
+/* SLIDERS */
+.srow{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}
+.srow:last-child{margin-bottom:0}
+.shdr{display:flex;justify-content:space-between;align-items:center}
+.slbl{font-size:11px;color:var(--txt)}
+.sval{font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:30px;text-align:right}
+input[type=range]{-webkit-appearance:none;width:100%;height:3px;background:var(--s3);border-radius:2px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#fff;cursor:pointer}
+
+/* TOGGLE */
+.trow{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.tlabel{font-size:11px;color:var(--txt)}
+.tswitch{position:relative;width:32px;height:18px;flex-shrink:0}
+.tswitch input{opacity:0;width:0;height:0}
+.ttrack{position:absolute;inset:0;background:var(--s3);border:0.5px solid var(--b2);border-radius:9px;cursor:pointer;transition:background .2s}
+.ttrack::after{content:'';position:absolute;left:3px;top:3px;width:10px;height:10px;border-radius:50%;background:var(--muted);transition:transform .2s,background .2s}
+.tswitch input:checked+.ttrack{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.35)}
+.tswitch input:checked+.ttrack::after{transform:translateX(14px);background:#fff}
+
+/* EXPORT */
+.exp-btn{width:100%;padding:10px;border-radius:var(--rs);border:none;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:opacity .15s,transform .1s;letter-spacing:0.04em;text-transform:uppercase}
+.exp-btn.primary{background:#fff;color:#000}
+.exp-btn.secondary{background:var(--s2);color:var(--txt);border:0.5px solid var(--b2);margin-top:6px}
+.exp-btn:disabled{opacity:0.3;cursor:not-allowed}
+.exp-btn:not(:disabled):hover{opacity:0.88}
+.exp-btn:not(:disabled):active{transform:scale(0.98)}
+.exp-btn svg{width:13px;height:13px}
+
+.exprog{display:none;margin-top:10px}
+.exprog.show{display:block}
+.epbar{height:2px;background:var(--s3);border-radius:2px;overflow:hidden;margin-bottom:5px}
+.epfill{height:100%;background:#fff;border-radius:2px;width:0%;transition:width .1s}
+.eplbl{font-size:10px;color:var(--muted);text-align:center}
+
+.finfo{background:var(--s2);border-radius:var(--rs);padding:8px 12px;display:none;gap:8px;align-items:center;margin-bottom:10px}
+.finfo.show{display:flex}
+.finfo-icon svg{width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:1.5}
+.finfo-name{font-size:11px;color:var(--txt);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.finfo-sz{font-size:10px;color:var(--muted)}
 
-  :root {
-    --bg: #0e0e0e;
-    --surface: #1a1a1a;
-    --surface2: #242424;
-    --border: rgba(255,255,255,0.08);
-    --border2: rgba(255,255,255,0.14);
-    --text: #f0f0f0;
-    --muted: #888;
-    --accent: #e8e8e8;
-    --accent-dim: rgba(232,232,232,0.12);
-    --radius: 12px;
-    --radius-sm: 8px;
-  }
+select{width:100%;background:var(--s2);border:0.5px solid var(--b2);color:var(--txt);font-size:11px;padding:6px 8px;border-radius:var(--rs);outline:none;cursor:pointer;-webkit-appearance:none;appearance:none}
+select:focus{border-color:var(--b3)}
 
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
+.fx-params{display:none;margin-top:12px}
+.fx-params.show{display:block}
 
-  header {
-    padding: 18px 32px;
-    border-bottom: 0.5px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .logo-mark {
-    width: 28px; height: 28px;
-    border-radius: 6px;
-    background: linear-gradient(135deg, #fff 0%, #666 100%);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .logo-mark svg { width: 14px; height: 14px; }
-
-  .logo-text {
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    color: var(--text);
-  }
-
-  .logo-sub {
-    font-size: 12px;
-    color: var(--muted);
-    margin-left: 4px;
-    font-weight: 400;
-    letter-spacing: 0;
-  }
-
-  .main {
-    flex: 1;
-    display: grid;
-    grid-template-columns: 1fr 320px;
-    gap: 0;
-    overflow: hidden;
-  }
-
-  .preview-area {
-    display: flex;
-    flex-direction: column;
-    padding: 32px;
-    gap: 24px;
-    border-right: 0.5px solid var(--border);
-  }
-
-  .drop-zone {
-    flex: 1;
-    border: 1.5px dashed var(--border2);
-    border-radius: var(--radius);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
-    min-height: 360px;
-    position: relative;
-    overflow: hidden;
-    background: var(--surface);
-  }
-
-  .drop-zone:hover, .drop-zone.drag-over {
-    border-color: rgba(255,255,255,0.35);
-    background: var(--surface2);
-  }
-
-  .drop-icon {
-    width: 52px; height: 52px;
-    border-radius: 50%;
-    background: var(--surface2);
-    border: 0.5px solid var(--border2);
-    display: flex; align-items: center; justify-content: center;
-  }
-
-  .drop-icon svg { width: 22px; height: 22px; stroke: var(--muted); stroke-width: 1.5; fill: none; }
-
-  .drop-title { font-size: 15px; font-weight: 500; color: var(--text); }
-  .drop-sub { font-size: 13px; color: var(--muted); }
-
-  .upload-btn-inline {
-    margin-top: 4px;
-    padding: 8px 20px;
-    border-radius: 6px;
-    background: rgba(255,255,255,0.1);
-    border: 0.5px solid var(--border2);
-    color: var(--text);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-  .upload-btn-inline:hover { background: rgba(255,255,255,0.18); }
-
-  #fileInput { display: none; }
-
-  .video-wrapper {
-    position: relative;
-    width: 100%;
-    background: #000;
-    border-radius: var(--radius);
-    overflow: hidden;
-    aspect-ratio: 16/9;
-  }
-
-  #sourceVideo {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-    width: 1px; height: 1px;
-  }
-
-  #outputCanvas {
-    width: 100%;
-    height: 100%;
-    display: block;
-    object-fit: contain;
-  }
-
-  .video-controls {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    background: rgba(0,0,0,0.5);
-    border-top: 0.5px solid var(--border);
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-  }
-
-  .ctrl-btn {
-    width: 34px; height: 34px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.12);
-    border: none;
-    color: #fff;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    transition: background 0.15s;
-  }
-  .ctrl-btn:hover { background: rgba(255,255,255,0.22); }
-  .ctrl-btn svg { width: 16px; height: 16px; fill: #fff; }
-
-  .progress-bar {
-    flex: 1;
-    height: 4px;
-    background: rgba(255,255,255,0.15);
-    border-radius: 2px;
-    cursor: pointer;
-    position: relative;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: #fff;
-    border-radius: 2px;
-    width: 0%;
-    pointer-events: none;
-  }
-
-  .time-label {
-    font-size: 12px;
-    color: rgba(255,255,255,0.6);
-    font-variant-numeric: tabular-nums;
-    flex-shrink: 0;
-  }
-
-  .panel {
-    padding: 28px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 28px;
-    overflow-y: auto;
-  }
-
-  .panel-title {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 14px;
-  }
-
-  .filter-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-
-  .filter-thumb {
-    border-radius: var(--radius-sm);
-    border: 1.5px solid transparent;
-    cursor: pointer;
-    overflow: hidden;
-    aspect-ratio: 16/9;
-    background: var(--surface2);
-    display: flex; align-items: center; justify-content: center;
-    transition: border-color 0.15s;
-    position: relative;
-  }
-
-  .filter-thumb.active { border-color: #fff; }
-  .filter-thumb:hover:not(.active) { border-color: var(--border2); }
-
-  .filter-thumb canvas { width: 100%; height: 100%; display: block; }
-
-  .filter-name {
-    position: absolute;
-    bottom: 6px; left: 8px;
-    font-size: 11px;
-    color: #fff;
-    font-weight: 500;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-  }
-
-  .custom-filter-panel {
-    display: none;
-    flex-direction: column;
-    gap: 10px;
-    background: var(--surface2);
-    border-radius: var(--radius-sm);
-    padding: 14px;
-    margin-top: 8px;
-    border: 0.5px solid var(--border2);
-  }
-
-  .custom-filter-panel.visible { display: flex; }
-
-  .custom-row {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-  }
-
-  .custom-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .custom-label {
-    font-size: 12px;
-    font-weight: 500;
-  }
-
-  .custom-label.r { color: #f08080; }
-  .custom-label.g { color: #80d080; }
-  .custom-label.b { color: #80a8f0; }
-
-  .custom-val {
-    font-size: 12px;
-    color: var(--muted);
-    font-variant-numeric: tabular-nums;
-    min-width: 38px;
-    text-align: right;
-  }
-
-  .custom-sum {
-    font-size: 11px;
-    color: var(--muted);
-    text-align: center;
-    padding-top: 4px;
-    border-top: 0.5px solid var(--border);
-  }
-
-  .custom-sum span {
-    font-weight: 600;
-    color: var(--text);
-  }
-
-  .custom-reset {
-    font-size: 11px;
-    color: var(--muted);
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    text-decoration: underline;
-    text-underline-offset: 2px;
-  }
-
-  .custom-reset:hover { color: var(--text); }
-
-  .slider-group { display: flex; flex-direction: column; gap: 14px; }
-
-  .slider-row {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .slider-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .slider-label { font-size: 13px; color: var(--text); }
-
-  .slider-val {
-    font-size: 12px;
-    color: var(--muted);
-    font-variant-numeric: tabular-nums;
-    min-width: 32px;
-    text-align: right;
-  }
-
-  input[type=range] {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 4px;
-    background: var(--surface2);
-    border-radius: 2px;
-    outline: none;
-    cursor: pointer;
-  }
-
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 14px; height: 14px;
-    border-radius: 50%;
-    background: #fff;
-    cursor: pointer;
-  }
-
-  .export-section { margin-top: auto; }
-
-  .export-btn {
-    width: 100%;
-    padding: 12px;
-    border-radius: var(--radius-sm);
-    background: #fff;
-    color: #0e0e0e;
-    border: none;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    transition: opacity 0.15s, transform 0.1s;
-  }
-
-  .export-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-  .export-btn:not(:disabled):hover { opacity: 0.92; }
-  .export-btn:not(:disabled):active { transform: scale(0.98); }
-
-  .export-btn svg { width: 16px; height: 16px; }
-
-  .file-info {
-    background: var(--surface2);
-    border-radius: var(--radius-sm);
-    padding: 10px 14px;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
-
-  .file-info-icon { color: var(--muted); flex-shrink: 0; }
-  .file-info-icon svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.5; }
-  .file-info-name { font-size: 13px; color: var(--text); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .file-info-size { font-size: 11px; color: var(--muted); margin-top: 2px; }
-
-  .export-progress {
-    margin-top: 12px;
-    display: none;
-  }
-
-  .export-progress.show { display: block; }
-
-  .export-progress-bar {
-    height: 3px;
-    background: var(--surface2);
-    border-radius: 2px;
-    overflow: hidden;
-    margin-bottom: 6px;
-  }
-
-  .export-progress-fill {
-    height: 100%;
-    background: #fff;
-    border-radius: 2px;
-    width: 0%;
-    transition: width 0.1s;
-  }
-
-  .export-progress-label {
-    font-size: 11px;
-    color: var(--muted);
-    text-align: center;
-  }
-
-  .randomizer-section {
-    border-top: 0.5px solid var(--border);
-    padding-top: 20px;
-  }
-
-  .toggle-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 14px;
-  }
-
-  .toggle-label {
-    font-size: 13px;
-    color: var(--text);
-    font-weight: 500;
-  }
-
-  .toggle-sub {
-    font-size: 11px;
-    color: var(--muted);
-    margin-top: 2px;
-  }
-
-  .toggle-switch {
-    position: relative;
-    width: 36px; height: 20px;
-    flex-shrink: 0;
-  }
-
-  .toggle-switch input { opacity: 0; width: 0; height: 0; }
-
-  .toggle-track {
-    position: absolute;
-    inset: 0;
-    background: var(--surface2);
-    border: 0.5px solid var(--border2);
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
-  }
-
-  .toggle-track::after {
-    content: '';
-    position: absolute;
-    left: 3px; top: 3px;
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    background: var(--muted);
-    transition: transform 0.2s, background 0.2s;
-  }
-
-  .toggle-switch input:checked + .toggle-track {
-    background: rgba(255,255,255,0.15);
-    border-color: rgba(255,255,255,0.4);
-  }
-
-  .toggle-switch input:checked + .toggle-track::after {
-    transform: translateX(16px);
-    background: #fff;
-  }
-
-  .randomizer-controls {
-    display: none;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .randomizer-controls.visible { display: flex; }
-
-  .mode-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-  }
-
-  .mode-btn {
-    padding: 7px 6px;
-    border-radius: var(--radius-sm);
-    border: 0.5px solid var(--border2);
-    background: var(--surface2);
-    color: var(--muted);
-    font-size: 11px;
-    font-weight: 500;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.15s;
-    line-height: 1.3;
-  }
-
-  .mode-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.25); }
-  .mode-btn.active { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.4); color: #fff; }
-
-  .reseed-btn {
-    width: 100%;
-    padding: 8px;
-    border-radius: var(--radius-sm);
-    background: none;
-    border: 0.5px solid var(--border2);
-    color: var(--muted);
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.15s;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-  }
-
-  .reseed-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.3); }
-  .reseed-btn svg { width: 13px; height: 13px; }
-
-  .no-video-state { display: flex; }
-  .has-video-state { display: none; }
-
-  body.video-loaded .no-video-state { display: none; }
-  body.video-loaded .has-video-state { display: flex; }
-  body.video-loaded .preview-area { gap: 16px; }
+.note{font-size:10px;color:var(--dim);line-height:1.5;margin-top:6px}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo-mark">
-    <svg viewBox="0 0 14 14" fill="none">
-      <circle cx="7" cy="7" r="6" stroke="#000" stroke-width="1.5"/>
-      <path d="M4 7 Q7 3 10 7 Q7 11 4 7Z" fill="#000"/>
-    </svg>
+  <div class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="10" stroke="#444" stroke-width="0.5"/>
+        <circle cx="12" cy="12" r="10" stroke="url(#lg)" stroke-width="1.5" stroke-dasharray="3 2"/>
+        <circle cx="12" cy="12" r="4" fill="#fff" opacity="0.9"/>
+        <circle cx="12" cy="12" r="2" fill="#000"/>
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="24" y2="24"><stop offset="0%" stop-color="#ff6b35"/><stop offset="50%" stop-color="#a855f7"/><stop offset="100%" stop-color="#3b82f6"/></linearGradient></defs>
+      </svg>
+    </div>
+    <span class="logo-name">Voidframe<span class="logo-sub">Abstract Studio</span></span>
   </div>
-  <span class="logo-text">Monochrome<span class="logo-sub">B&W Studio</span></span>
+  <div class="header-right">
+    <span class="pill">Canvas</span>
+  </div>
 </header>
 
 <div class="main">
-  <div class="preview-area">
+  <div class="preview">
 
-    <div class="drop-zone no-video-state" id="dropZone">
-      <div class="drop-icon">
+    <div class="drop-zone" id="dropZone">
+      <div class="dz-icon">
         <svg viewBox="0 0 24 24"><path d="M15 10l4.553-2.277A1 1 0 0121 8.57v6.858a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
       </div>
-      <p class="drop-title">Drop your video here</p>
-      <p class="drop-sub">MP4, WebM, MOV · up to 500 MB</p>
-      <button class="upload-btn-inline" onclick="document.getElementById('fileInput').click()">Choose file</button>
+      <p class="dz-title">Drop video here</p>
+      <p class="dz-sub">MP4, WebM, MOV</p>
+      <button class="dz-btn" onclick="document.getElementById('fileInput').click()">Choose file</button>
       <input type="file" id="fileInput" accept="video/*">
     </div>
 
-    <div class="video-wrapper has-video-state" style="flex:1; min-height: 0; display: none;">
-      <video id="sourceVideo" playsinline></video>
-      <canvas id="outputCanvas"></canvas>
-      <div class="video-controls" id="videoControls">
-        <button class="ctrl-btn" id="playPauseBtn" onclick="togglePlay()">
-          <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    <div class="video-area" id="videoArea">
+      <video id="srcVideo" playsinline></video>
+      <canvas id="cvs"></canvas>
+      <div class="vcontrols">
+        <button class="vbtn" onclick="togglePlay()">
+          <svg id="playIco" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
         </button>
-        <div class="progress-bar" id="progressBar" onclick="seekVideo(event)">
-          <div class="progress-fill" id="progressFill"></div>
+        <div class="pbar" id="pbar" onclick="seek(event)">
+          <div class="pfill" id="pfill"></div>
         </div>
-        <span class="time-label" id="timeLabel">0:00 / 0:00</span>
+        <span class="tlbl" id="tlbl">0:00 / 0:00</span>
       </div>
     </div>
 
@@ -586,372 +167,684 @@
 
   <div class="panel">
 
-    <div>
-      <p class="panel-title">Filter</p>
-      <div class="filter-grid" id="filterGrid"></div>
+    <!-- EFFECTS -->
+    <div class="sect">
+      <p class="sect-title">Effect</p>
+      <div class="fx-grid" id="fxGrid">
 
-      <div class="custom-filter-panel" id="customPanel">
-        <div class="custom-row">
-          <div class="custom-header">
-            <span class="custom-label r">Red channel</span>
-            <span class="custom-val" id="crVal">0.299</span>
-          </div>
-          <input type="range" min="0" max="100" value="30" id="crSlider" oninput="updateCustomFilter()">
+        <div class="fx-card active" data-fx="none" onclick="setFx(this)">
+          <p class="fx-name">None</p>
+          <p class="fx-desc">Raw video, no processing</p>
         </div>
-        <div class="custom-row">
-          <div class="custom-header">
-            <span class="custom-label g">Green channel</span>
-            <span class="custom-val" id="cgVal">0.587</span>
-          </div>
-          <input type="range" min="0" max="100" value="59" id="cgSlider" oninput="updateCustomFilter()">
+
+        <div class="fx-card" data-fx="bw" onclick="setFx(this)">
+          <p class="fx-name">B&W</p>
+          <p class="fx-desc">Classic monochrome</p>
         </div>
-        <div class="custom-row">
-          <div class="custom-header">
-            <span class="custom-label b">Blue channel</span>
-            <span class="custom-val" id="cbVal">0.114</span>
-          </div>
-          <input type="range" min="0" max="100" value="11" id="cbSlider" oninput="updateCustomFilter()">
+
+        <div class="fx-card" data-fx="edgeburn" onclick="setFx(this)">
+          <p class="fx-name">Edge Burn</p>
+          <p class="fx-desc">Glowing outlines on dark</p>
         </div>
-        <div class="custom-sum">
-          Mix total: <span id="customSum">1.00</span>
-          <button class="custom-reset" onclick="resetCustomFilter()">reset to classic</button>
+
+        <div class="fx-card" data-fx="kaleid" onclick="setFx(this)">
+          <p class="fx-name">Kaleidoscope</p>
+          <p class="fx-desc">Mirrored symmetry fold</p>
         </div>
+
+        <div class="fx-card" data-fx="chroma" onclick="setFx(this)">
+          <p class="fx-name">Chroma Split</p>
+          <p class="fx-desc">RGB channel separation</p>
+        </div>
+
+        <div class="fx-card" data-fx="scribble" onclick="setFx(this)">
+          <p class="fx-name">Scribble Field</p>
+          <p class="fx-desc">Vertical line energy</p>
+        </div>
+
+        <div class="fx-card" data-fx="colorflood" onclick="setFx(this)">
+          <p class="fx-name">Color Flood</p>
+          <p class="fx-desc">Deep hue saturation bleed</p>
+        </div>
+
+        <div class="fx-card" data-fx="pixelscram" onclick="setFx(this)">
+          <p class="fx-name">Pixel Chaos</p>
+          <p class="fx-desc">Random pixel displacement</p>
+        </div>
+
+        <div class="fx-card" data-fx="datamosh" onclick="setFx(this)">
+          <p class="fx-name">Datamosh</p>
+          <p class="fx-desc">Frame echo smearing</p>
+        </div>
+
+        <div class="fx-card" data-fx="thermal" onclick="setFx(this)">
+          <p class="fx-name">Thermal</p>
+          <p class="fx-desc">Heat-map color mapping</p>
+        </div>
+
       </div>
     </div>
 
-    <div>
-      <p class="panel-title">Adjust</p>
-      <div class="slider-group">
-        <div class="slider-row">
-          <div class="slider-header">
-            <span class="slider-label">Brightness</span>
-            <span class="slider-val" id="brightnessVal">100</span>
-          </div>
-          <input type="range" min="0" max="200" value="100" id="brightnessSlider" oninput="updateAdj()">
-        </div>
-        <div class="slider-row">
-          <div class="slider-header">
-            <span class="slider-label">Contrast</span>
-            <span class="slider-val" id="contrastVal">100</span>
-          </div>
-          <input type="range" min="0" max="200" value="100" id="contrastSlider" oninput="updateAdj()">
-        </div>
-        <div class="slider-row">
-          <div class="slider-header">
-            <span class="slider-label">Grain</span>
-            <span class="slider-val" id="grainVal">0</span>
-          </div>
-          <input type="range" min="0" max="50" value="0" id="grainSlider" oninput="updateAdj()">
-        </div>
-        <div class="slider-row">
-          <div class="slider-header">
-            <span class="slider-label">Vignette</span>
-            <span class="slider-val" id="vignetteVal">0</span>
-          </div>
-          <input type="range" min="0" max="100" value="0" id="vignetteSlider" oninput="updateAdj()">
-        </div>
+    <!-- FX PARAMS -->
+    <div class="sect" id="paramsSection">
+      <p class="sect-title">Parameters</p>
+      <div id="paramsBody">
+        <p style="font-size:11px;color:var(--dim)">No parameters for this effect.</p>
       </div>
     </div>
 
-    <div class="randomizer-section">
-      <p class="panel-title">Pixel Randomizer</p>
-
-      <div class="toggle-row">
+    <!-- FRAME RATE REDUCER -->
+    <div class="sect">
+      <p class="sect-title">Frame Rate</p>
+      <div class="trow">
         <div>
-          <p class="toggle-label">Enable randomizer</p>
-          <p class="toggle-sub">Scrambles pixels each frame</p>
+          <span class="tlabel">Reduce frame rate</span>
+          <p style="font-size:10px;color:var(--dim);margin-top:2px">Source: <span id="fpsSource">— fps</span></p>
         </div>
-        <label class="toggle-switch">
-          <input type="checkbox" id="randToggle" onchange="toggleRandomizer()">
-          <span class="toggle-track"></span>
-        </label>
+        <label class="tswitch"><input type="checkbox" id="fpsToggle" onchange="updateFps()"><span class="ttrack"></span></label>
       </div>
-
-      <div class="randomizer-controls" id="randControls">
-        <div class="mode-grid">
-          <button class="mode-btn active" data-mode="full" onclick="setRandMode(this)">Full chaos<br><span style="font-weight:400;color:inherit;opacity:0.6">every pixel</span></button>
-          <button class="mode-btn" data-mode="region" onclick="setRandMode(this)">Regional<br><span style="font-weight:400;color:inherit;opacity:0.6">blocks shuffle</span></button>
-          <button class="mode-btn" data-mode="scanline" onclick="setRandMode(this)">Scanline<br><span style="font-weight:400;color:inherit;opacity:0.6">row by row</span></button>
-          <button class="mode-btn" data-mode="drift" onclick="setRandMode(this)">Drift<br><span style="font-weight:400;color:inherit;opacity:0.6">slow evolving</span></button>
-        </div>
-
-        <div class="slider-row">
-          <div class="slider-header">
-            <span class="slider-label" style="font-size:12px;">Intensity</span>
-            <span class="slider-val" id="randIntVal">50%</span>
+      <div id="fpsControls" style="display:none">
+        <div class="srow">
+          <div class="shdr">
+            <span class="slbl">Target FPS</span>
+            <span class="sval" id="fpsVal">— fps</span>
           </div>
-          <input type="range" min="1" max="100" value="50" id="randIntSlider" oninput="updateRandInt()">
+          <input type="range" min="1" max="29" value="12" id="fpsSlider" oninput="updateFpsVal()">
         </div>
-
-        <div class="slider-row" id="seedSpeedRow">
-          <div class="slider-header">
-            <span class="slider-label" style="font-size:12px;">Seed speed</span>
-            <span class="slider-val" id="seedSpeedVal">3</span>
-          </div>
-          <input type="range" min="1" max="10" value="3" id="seedSpeedSlider" oninput="document.getElementById('seedSpeedVal').textContent=this.value">
-        </div>
-
-        <button class="reseed-btn" onclick="reseed()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-          New random pattern
-        </button>
+        <p class="note">Always below source FPS. Lower values give a choppy, stop-motion feel.</p>
       </div>
     </div>
 
-    <div class="export-section">
-      <p class="panel-title">Export</p>
-      <div class="file-info" id="fileInfo" style="display:none; margin-bottom:12px;">
-        <span class="file-info-icon">
-          <svg viewBox="0 0 24 24"><path d="M15 10l4.553-2.277A1 1 0 0121 8.57v6.858a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
-        </span>
+    <!-- EXPORT -->
+    <div class="sect">
+      <p class="sect-title">Export</p>
+      <div class="finfo" id="finfo">
+        <span class="finfo-icon"><svg viewBox="0 0 24 24"><path d="M15 10l4.553-2.277A1 1 0 0121 8.57v6.858a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg></span>
         <div>
-          <p class="file-info-name" id="fileName">—</p>
-          <p class="file-info-size" id="fileSize">—</p>
+          <p class="finfo-name" id="finfoName">—</p>
+          <p class="finfo-sz" id="finfoSz">—</p>
         </div>
       </div>
-      <button class="export-btn" id="exportBtn" disabled onclick="exportVideo()">
+      <button class="exp-btn primary" id="expBtn" disabled onclick="exportVideo()">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg>
-        Export B&W video
+        Export with effect
       </button>
-      <div class="export-progress" id="exportProgress">
-        <div class="export-progress-bar"><div class="export-progress-fill" id="exportFill"></div></div>
-        <p class="export-progress-label" id="exportLabel">Preparing…</p>
+      <div class="exprog" id="exprog">
+        <div class="epbar"><div class="epfill" id="epfill"></div></div>
+        <p class="eplbl" id="eplbl">Preparing…</p>
       </div>
+      <p class="note" style="margin-top:8px">Exports as WebM. Use Chrome for best results.</p>
     </div>
 
   </div>
 </div>
 
 <script>
-const video = document.getElementById('sourceVideo');
-const canvas = document.getElementById('outputCanvas');
-const ctx = canvas.getContext('2d');
+// ─── STATE ───────────────────────────────────────────────
+const video = document.getElementById('srcVideo');
+const cvs   = document.getElementById('cvs');
+const ctx   = cvs.getContext('2d');
+let currentFx = 'none';
+let raf = null;
+let videoFile = null;
+let fpsReduceEnabled = false;
+let targetFps = 12;
+let videoFps = 30;
+let lastFrameTime = 0;
+let prevFrameData = null;
+let moshBlend = 0;
+let pixelMap = null;
+let frameCount = 0;
+
+// ─── FX PARAMS DEFINITIONS ──────────────────────────────
+const fxParams = {
+  none: [],
+  bw:   [{ id:'bw_contrast', label:'Contrast', min:50, max:200, val:100 }],
+  edgeburn: [
+    { id:'eb_thresh', label:'Edge threshold', min:10, max:80, val:30 },
+    { id:'eb_glow',   label:'Glow intensity', min:1,  max:5,  val:2  },
+  ],
+  kaleid: [
+    { id:'kl_segs',  label:'Segments',  min:2, max:16, val:4 },
+    { id:'kl_rot',   label:'Rotation speed', min:0, max:10, val:2 },
+  ],
+  chroma: [
+    { id:'ch_shift', label:'Channel shift', min:1, max:40, val:10 },
+    { id:'ch_angle', label:'Angle',         min:0, max:360, val:0  },
+  ],
+  scribble: [
+    { id:'sc_dens',  label:'Density',   min:1,  max:20,  val:8  },
+    { id:'sc_amp',   label:'Amplitude', min:5,  max:100, val:30 },
+    { id:'sc_speed', label:'Speed',     min:1,  max:10,  val:4  },
+  ],
+  colorflood: [
+    { id:'cf_sat',   label:'Saturation boost', min:100, max:400, val:200 },
+    { id:'cf_hrot',  label:'Hue rotate',        min:0,   max:360, val:0   },
+    { id:'cf_bleed', label:'Bleed amount',       min:0,   max:20,  val:5   },
+  ],
+  pixelscram: [
+    { id:'ps_int',   label:'Intensity',   min:1,  max:100, val:40  },
+    { id:'ps_block', label:'Block size',  min:1,  max:30,  val:1   },
+  ],
+  datamosh: [
+    { id:'dm_blend', label:'Echo blend',  min:5,  max:95,  val:40 },
+    { id:'dm_glitch',label:'Glitch rate', min:0,  max:100, val:20 },
+  ],
+  thermal: [
+    { id:'th_shift', label:'Color shift', min:0, max:360, val:0 },
+    { id:'th_boost', label:'Intensity',   min:50, max:200, val:100 },
+  ],
+};
+
+const paramVals = {};
+Object.entries(fxParams).forEach(([fx, params]) => {
+  params.forEach(p => { paramVals[p.id] = p.val; });
+});
+
+function setFx(card) {
+  document.querySelectorAll('.fx-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+  currentFx = card.dataset.fx;
+  pixelMap = null;
+  prevFrameData = null;
+  renderParams(currentFx);
+}
+
+function renderParams(fx) {
+  const params = fxParams[fx] || [];
+  const body = document.getElementById('paramsBody');
+  if (!params.length) {
+    body.innerHTML = '<p style="font-size:11px;color:var(--dim)">No parameters for this effect.</p>';
+    return;
+  }
+  body.innerHTML = params.map(p => `
+    <div class="srow">
+      <div class="shdr">
+        <span class="slbl">${p.label}</span>
+        <span class="sval" id="sv_${p.id}">${paramVals[p.id]}</span>
+      </div>
+      <input type="range" min="${p.min}" max="${p.max}" value="${paramVals[p.id]}"
+        oninput="paramVals['${p.id}']=+this.value;document.getElementById('sv_${p.id}').textContent=this.value;pixelMap=null;">
+    </div>
+  `).join('');
+}
+
+// ─── DROP / LOAD ─────────────────────────────────────────
 const dropZone = document.getElementById('dropZone');
 const fileInput = document.getElementById('fileInput');
 
-let currentFilter = 'classic';
-let brightness = 100, contrast = 100, grain = 0, vignette = 0;
-let animFrameId = null;
-let videoFile = null;
-
-const filters = [
-  { id: 'classic',   name: 'Classic',   r: 0.299, g: 0.587, b: 0.114 },
-  { id: 'warm',      name: 'Warm',      r: 0.40,  g: 0.55,  b: 0.05  },
-  { id: 'cool',      name: 'Cool',      r: 0.20,  g: 0.55,  b: 0.25  },
-  { id: 'high',      name: 'High Key',  r: 0.299, g: 0.587, b: 0.114, bright: 140 },
-  { id: 'custom',    name: 'Custom',    r: 0.299, g: 0.587, b: 0.114 },
-];
-
-function buildFilterGrid() {
-  const grid = document.getElementById('filterGrid');
-  const sampleCanvas = document.createElement('canvas');
-  sampleCanvas.width = 160; sampleCanvas.height = 90;
-  const sc = sampleCanvas.getContext('2d');
-  const grd = sc.createLinearGradient(0, 0, 160, 90);
-  grd.addColorStop(0, '#3a5e8c');
-  grd.addColorStop(0.5, '#c7853a');
-  grd.addColorStop(1, '#5a8c4e');
-  sc.fillStyle = grd;
-  sc.fillRect(0, 0, 160, 90);
-
-  filters.forEach(f => {
-    const thumb = document.createElement('div');
-    thumb.className = 'filter-thumb' + (f.id === currentFilter ? ' active' : '');
-    thumb.dataset.id = f.id;
-
-    const tc = document.createElement('canvas');
-    tc.width = 160; tc.height = 90;
-    const tctx = tc.getContext('2d');
-    tctx.drawImage(sampleCanvas, 0, 0);
-    const id = tctx.getImageData(0, 0, 160, 90);
-    const d = id.data;
-    const bBoost = f.bright || 100;
-    for (let i = 0; i < d.length; i += 4) {
-      let g = d[i]*f.r + d[i+1]*f.g + d[i+2]*f.b;
-      g = Math.min(255, g * bBoost / 100);
-      d[i] = d[i+1] = d[i+2] = g;
-    }
-    tctx.putImageData(id, 0, 0);
-    thumb.appendChild(tc);
-
-    const lbl = document.createElement('span');
-    lbl.className = 'filter-name';
-    lbl.textContent = f.name;
-    thumb.appendChild(lbl);
-
-    thumb.onclick = () => {
-      document.querySelectorAll('.filter-thumb').forEach(t => t.classList.remove('active'));
-      thumb.classList.add('active');
-      currentFilter = f.id;
-      document.getElementById('customPanel').classList.toggle('visible', f.id === 'custom');
-    };
-    grid.appendChild(thumb);
-  });
-}
-
-function updateAdj() {
-  brightness = +document.getElementById('brightnessSlider').value;
-  contrast   = +document.getElementById('contrastSlider').value;
-  grain      = +document.getElementById('grainSlider').value;
-  vignette   = +document.getElementById('vignetteSlider').value;
-  document.getElementById('brightnessVal').textContent = brightness;
-  document.getElementById('contrastVal').textContent   = contrast;
-  document.getElementById('grainVal').textContent      = grain;
-  document.getElementById('vignetteVal').textContent   = vignette;
-}
-
-function applyBW(imageData, f) {
-  const d = imageData.data;
-  const W = imageData.width, H = imageData.height;
-  const bFactor = brightness / 100;
-  const cFactor = contrast / 100;
-
-  for (let i = 0; i < d.length; i += 4) {
-    let v = d[i]*f.r + d[i+1]*f.g + d[i+2]*f.b;
-    v *= bFactor;
-    v = (v - 128) * cFactor + 128;
-    if (grain > 0) v += (Math.random() - 0.5) * grain * 2;
-    v = Math.max(0, Math.min(255, v));
-    d[i] = d[i+1] = d[i+2] = v;
-  }
-
-  if (vignette > 0) {
-    const cx = W/2, cy = H/2;
-    const maxDist = Math.sqrt(cx*cx + cy*cy);
-    const strength = vignette / 100;
-    for (let y = 0; y < H; y++) {
-      for (let x = 0; x < W; x++) {
-        const idx = (y*W + x)*4;
-        const dist = Math.sqrt((x-cx)**2 + (y-cy)**2);
-        const factor = 1 - strength * (dist/maxDist)**1.5;
-        d[idx]   = Math.max(0, d[idx]   * factor);
-        d[idx+1] = Math.max(0, d[idx+1] * factor);
-        d[idx+2] = Math.max(0, d[idx+2] * factor);
-      }
-    }
-  }
-  return imageData;
-}
-
-function renderFrame() {
-  if (video.paused && video.currentTime === 0) return;
-  const f = filters.find(x => x.id === currentFilter) || filters[0];
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-  let imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  imgData = applyBW(imgData, f);
-  if (randEnabled) { frameCount++; imgData = applyPixelRandomizer(imgData); }
-  ctx.putImageData(imgData, 0, 0);
-  if (!video.paused && !video.ended) {
-    animFrameId = requestAnimationFrame(renderFrame);
-  }
-}
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('over');
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith('video/')) loadVideo(f);
+});
+fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadVideo(fileInput.files[0]); });
+dropZone.addEventListener('click', e => { if (e.target === dropZone) fileInput.click(); });
 
 function loadVideo(file) {
   videoFile = file;
-  const url = URL.createObjectURL(file);
-  video.src = url;
+  video.src = URL.createObjectURL(file);
   video.onloadedmetadata = () => {
-    canvas.width  = video.videoWidth;
-    canvas.height = video.videoHeight;
-    document.body.classList.add('video-loaded');
-    document.querySelector('.has-video-state').style.display = 'flex';
-    document.getElementById('fileInfo').style.display = 'flex';
-    document.getElementById('fileName').textContent = file.name;
-    document.getElementById('fileSize').textContent = (file.size/(1024*1024)).toFixed(1) + ' MB';
-    document.getElementById('exportBtn').disabled = false;
+    cvs.width  = video.videoWidth;
+    cvs.height = video.videoHeight;
+    dropZone.style.display = 'none';
+    document.getElementById('videoArea').style.display = 'block';
+    document.getElementById('finfo').classList.add('show');
+    document.getElementById('finfoName').textContent = file.name;
+    document.getElementById('finfoSz').textContent   = (file.size/1024/1024).toFixed(1) + ' MB';
+    document.getElementById('expBtn').disabled = false;
+    prevFrameData = null; pixelMap = null;
     video.currentTime = 0.01;
-    video.onseeked = () => { renderFrame(); video.onseeked = null; };
+    video.onseeked = () => { drawFrame(); video.onseeked = null; };
+    detectFps(video);
   };
   video.ontimeupdate = () => {
     const pct = video.currentTime / video.duration * 100;
-    document.getElementById('progressFill').style.width = pct + '%';
-    document.getElementById('timeLabel').textContent = fmt(video.currentTime) + ' / ' + fmt(video.duration);
+    document.getElementById('pfill').style.width = pct + '%';
+    document.getElementById('tlbl').textContent = fmt(video.currentTime) + ' / ' + fmt(video.duration);
   };
-  video.onended = () => {
-    document.getElementById('playIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
-  };
+  video.onended = () => { document.getElementById('playIco').innerHTML = '<path d="M8 5v14l11-7z"/>'; };
 }
 
 function fmt(s) {
   s = isNaN(s) ? 0 : s;
-  const m = Math.floor(s/60);
-  const sec = Math.floor(s%60).toString().padStart(2,'0');
-  return m + ':' + sec;
+  return Math.floor(s/60) + ':' + String(Math.floor(s%60)).padStart(2,'0');
 }
 
 function togglePlay() {
   if (!video.src) return;
   if (video.paused) {
     video.play();
-    document.getElementById('playIcon').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
-    animFrameId = requestAnimationFrame(renderFrame);
+    document.getElementById('playIco').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+    raf = requestAnimationFrame(loop);
   } else {
     video.pause();
-    document.getElementById('playIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
-    cancelAnimationFrame(animFrameId);
+    document.getElementById('playIco').innerHTML = '<path d="M8 5v14l11-7z"/>';
+    cancelAnimationFrame(raf);
   }
 }
 
-function seekVideo(e) {
-  const bar = document.getElementById('progressBar');
-  const rect = bar.getBoundingClientRect();
-  const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-  video.currentTime = pct * video.duration;
-  video.onseeked = () => { renderFrame(); };
+function seek(e) {
+  const r = document.getElementById('pbar').getBoundingClientRect();
+  video.currentTime = Math.max(0, Math.min(1, (e.clientX - r.left)/r.width)) * video.duration;
+  video.onseeked = () => { drawFrame(); };
 }
 
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault(); dropZone.classList.remove('drag-over');
-  const file = e.dataTransfer.files[0];
-  if (file && file.type.startsWith('video/')) loadVideo(file);
-});
-fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadVideo(fileInput.files[0]); });
-dropZone.addEventListener('click', e => { if (e.target === dropZone) fileInput.click(); });
+// ─── FPS CONTROL ─────────────────────────────────────────
+function detectFps(v) {
+  // Try to read frame rate from video track
+  let detected = 30;
+  if (v.videoTracks && v.videoTracks[0] && v.videoTracks[0].getSettings) {
+    const s = v.videoTracks[0].getSettings();
+    if (s.frameRate) detected = Math.round(s.frameRate);
+  }
+  videoFps = detected;
 
+  // Count frames over a short window as fallback / confirmation
+  let frames = 0;
+  const startTime = performance.now();
+  function countFrame() {
+    frames++;
+    const elapsed = performance.now() - startTime;
+    if (elapsed < 500) {
+      v.requestVideoFrameCallback ? v.requestVideoFrameCallback(countFrame) : null;
+    } else {
+      const measured = Math.round(frames / (elapsed / 1000));
+      if (measured > 1 && measured < 200) videoFps = measured;
+      updateFpsSliderBounds();
+    }
+  }
+  if (v.requestVideoFrameCallback) {
+    v.requestVideoFrameCallback(countFrame);
+  } else {
+    updateFpsSliderBounds();
+  }
+}
+
+function updateFpsSliderBounds() {
+  const slider = document.getElementById('fpsSlider');
+  // Max is always strictly less than source FPS — at least 1 below
+  const maxAllowed = Math.max(1, videoFps - 1);
+  // Default target = half the source fps, clamped to [1, maxAllowed]
+  const defaultTarget = Math.max(1, Math.min(maxAllowed, Math.round(videoFps / 2)));
+  slider.max   = maxAllowed;
+  slider.value = defaultTarget;
+  targetFps    = defaultTarget;
+  document.getElementById('fpsVal').textContent   = targetFps + ' fps';
+  document.getElementById('fpsSource').textContent = videoFps + ' fps';
+}
+
+function updateFps() {
+  fpsReduceEnabled = document.getElementById('fpsToggle').checked;
+  document.getElementById('fpsControls').style.display = fpsReduceEnabled ? 'block' : 'none';
+}
+
+function updateFpsVal() {
+  targetFps = +document.getElementById('fpsSlider').value;
+  // Hard enforce: never allow target >= source
+  if (targetFps >= videoFps) {
+    targetFps = videoFps - 1;
+    document.getElementById('fpsSlider').value = targetFps;
+  }
+  document.getElementById('fpsVal').textContent = targetFps + ' fps';
+}
+
+// ─── RENDER LOOP ─────────────────────────────────────────
+function loop(ts) {
+  if (video.paused || video.ended) return;
+  if (fpsReduceEnabled) {
+    const interval = 1000 / targetFps;
+    if (ts - lastFrameTime < interval) { raf = requestAnimationFrame(loop); return; }
+    lastFrameTime = ts;
+  }
+  frameCount++;
+  drawFrame();
+  raf = requestAnimationFrame(loop);
+}
+
+function drawFrame() {
+  ctx.drawImage(video, 0, 0, cvs.width, cvs.height);
+  let id = ctx.getImageData(0, 0, cvs.width, cvs.height);
+  id = applyFx(id, currentFx);
+  ctx.putImageData(id, 0, 0);
+}
+
+// ─── EFFECTS ─────────────────────────────────────────────
+function applyFx(id, fx) {
+  switch(fx) {
+    case 'bw':         return fxBW(id);
+    case 'edgeburn':   return fxEdgeBurn(id);
+    case 'kaleid':     return fxKaleid(id);
+    case 'chroma':     return fxChroma(id);
+    case 'scribble':   return fxScribble(id);
+    case 'colorflood': return fxColorFlood(id);
+    case 'pixelscram': return fxPixelScram(id);
+    case 'datamosh':   return fxDatamosh(id);
+    case 'thermal':    return fxThermal(id);
+    default:           return id;
+  }
+}
+
+// B&W
+function fxBW(id) {
+  const d = id.data;
+  const c = paramVals.bw_contrast / 100;
+  for (let i = 0; i < d.length; i += 4) {
+    let v = d[i]*0.299 + d[i+1]*0.587 + d[i+2]*0.114;
+    v = (v - 128)*c + 128;
+    d[i] = d[i+1] = d[i+2] = Math.max(0, Math.min(255, v));
+  }
+  return id;
+}
+
+// EDGE BURN — extract luminance edges, invert to bright-on-black, glow
+function fxEdgeBurn(id) {
+  const W = id.width, H = id.height;
+  const d = id.data;
+  const thresh = paramVals.eb_thresh;
+  const glow   = paramVals.eb_glow;
+  const gray = new Float32Array(W * H);
+  for (let i = 0; i < W*H; i++) {
+    gray[i] = d[i*4]*0.299 + d[i*4+1]*0.587 + d[i*4+2]*0.114;
+  }
+  for (let y = 1; y < H-1; y++) {
+    for (let x = 1; x < W-1; x++) {
+      const gx = gray[y*W+x+1] - gray[y*W+x-1];
+      const gy = gray[(y+1)*W+x] - gray[(y-1)*W+x];
+      let mag = Math.sqrt(gx*gx + gy*gy);
+      mag = mag > thresh ? Math.min(255, mag * glow) : 0;
+      const i4 = (y*W+x)*4;
+      d[i4]   = Math.min(255, mag * 0.85 + 20);
+      d[i4+1] = Math.min(255, mag * 0.82);
+      d[i4+2] = Math.min(255, mag * 0.72);
+    }
+  }
+  return id;
+}
+
+// KALEIDOSCOPE — fold into N-segment symmetry from center
+function fxKaleid(id) {
+  const W = id.width, H = id.height;
+  const src = new Uint8ClampedArray(id.data);
+  const d   = id.data;
+  const segs = Math.max(2, Math.floor(paramVals.kl_segs));
+  const rotSpd = paramVals.kl_rot * 0.002;
+  const rot = frameCount * rotSpd;
+  const cx = W/2, cy = H/2;
+  const segAngle = Math.PI * 2 / segs;
+
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      let dx = x - cx, dy = y - cy;
+      let angle = Math.atan2(dy, dx) + rot;
+      const r = Math.sqrt(dx*dx + dy*dy);
+      angle = ((angle % segAngle) + segAngle) % segAngle;
+      if (angle > segAngle/2) angle = segAngle - angle;
+      const sx = Math.round(cx + r * Math.cos(angle));
+      const sy = Math.round(cy + r * Math.sin(angle));
+      const i4 = (y*W+x)*4;
+      if (sx>=0 && sx<W && sy>=0 && sy<H) {
+        const s4 = (sy*W+sx)*4;
+        d[i4]=src[s4]; d[i4+1]=src[s4+1]; d[i4+2]=src[s4+2];
+      }
+    }
+  }
+  return id;
+}
+
+// CHROMA SPLIT — shift R, G, B channels in different directions
+function fxChroma(id) {
+  const W = id.width, H = id.height;
+  const src = new Uint8ClampedArray(id.data);
+  const d   = id.data;
+  const shift = Math.floor(paramVals.ch_shift);
+  const angle = paramVals.ch_angle * Math.PI / 180;
+  const dx = Math.round(Math.cos(angle) * shift);
+  const dy = Math.round(Math.sin(angle) * shift);
+
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const i4 = (y*W+x)*4;
+      // Red: shifted forward
+      const rx = x+dx, ry = y+dy;
+      if (rx>=0&&rx<W&&ry>=0&&ry<H) d[i4] = src[(ry*W+rx)*4];
+      // Green: no shift
+      d[i4+1] = src[i4+1];
+      // Blue: shifted back
+      const bx = x-dx, by_ = y-dy;
+      if (bx>=0&&bx<W&&by_>=0&&by_<H) d[i4+2] = src[(by_*W+bx)*4+2];
+    }
+  }
+  return id;
+}
+
+// SCRIBBLE FIELD — vertical sine-wave line overlay derived from brightness
+function fxScribble(id) {
+  const W = id.width, H = id.height;
+  const d = id.data;
+  const dens  = paramVals.sc_dens;
+  const amp   = paramVals.sc_amp;
+  const speed = paramVals.sc_speed;
+  const t = frameCount * speed * 0.04;
+
+  // Draw vertical scribble lines derived from pixel brightness
+  for (let x = 0; x < W; x += Math.max(1, Math.round(W/60/dens*5))) {
+    for (let y = 0; y < H; y++) {
+      const i4 = (y*W+x)*4;
+      const bright = (d[i4]+d[i4+1]+d[i4+2])/3;
+      const wobble = Math.sin(y*0.05 + t + x*0.03) * amp * (bright/255);
+      const nx = Math.round(x + wobble);
+      if (nx>=0 && nx<W) {
+        const s4 = (y*W+nx)*4;
+        // boost the line pixel with a chromatic hue derived from column
+        const hue = (x/W * 360 + t*30) % 360;
+        const [hr,hg,hb] = hsl2rgb(hue, 0.7, 0.6);
+        d[i4]   = Math.min(255, d[i4]   * 0.5 + hr * 0.7);
+        d[i4+1] = Math.min(255, d[i4+1] * 0.5 + hg * 0.7);
+        d[i4+2] = Math.min(255, d[i4+2] * 0.5 + hb * 0.7);
+        d[s4]   = Math.min(255, d[s4]   * 0.3 + hr);
+        d[s4+1] = Math.min(255, d[s4+1] * 0.3 + hg);
+        d[s4+2] = Math.min(255, d[s4+2] * 0.3 + hb);
+      }
+    }
+  }
+  return id;
+}
+
+// COLOR FLOOD — extreme saturation + hue rotation + bleed
+function fxColorFlood(id) {
+  const W = id.width, H = id.height;
+  const d = id.data;
+  const sat   = paramVals.cf_sat / 100;
+  const hrot  = paramVals.cf_hrot;
+  const bleed = paramVals.cf_bleed;
+
+  // bleed pass — smear colors horizontally
+  if (bleed > 0) {
+    for (let y = 0; y < H; y++) {
+      let pr=0,pg=0,pb=0;
+      for (let x = 0; x < W; x++) {
+        const i4 = (y*W+x)*4;
+        pr = pr*0.9 + d[i4]*0.1;
+        pg = pg*0.9 + d[i4+1]*0.1;
+        pb = pb*0.9 + d[i4+2]*0.1;
+        d[i4]   = Math.min(255, d[i4]   * (1-bleed/100) + pr * (bleed/100) * 3);
+        d[i4+1] = Math.min(255, d[i4+1] * (1-bleed/100) + pg * (bleed/100) * 3);
+        d[i4+2] = Math.min(255, d[i4+2] * (1-bleed/100) + pb * (bleed/100) * 3);
+      }
+    }
+  }
+  // saturation + hue rotate
+  for (let i = 0; i < d.length; i += 4) {
+    let [h,s,l] = rgb2hsl(d[i],d[i+1],d[i+2]);
+    h = (h + hrot/360) % 1;
+    s = Math.min(1, s * sat);
+    const [r,g,b] = hsl2rgb(h*360, s, l);
+    d[i]=r; d[i+1]=g; d[i+2]=b;
+  }
+  return id;
+}
+
+// PIXEL SCRAMBLE — random pixel displacement in blocks
+function fxPixelScram(id) {
+  const W = id.width, H = id.height;
+  const src = new Uint8ClampedArray(id.data);
+  const d   = id.data;
+  const intensity = paramVals.ps_int / 100;
+  const blockSz   = Math.max(1, Math.floor(paramVals.ps_block));
+
+  // build / reuse map
+  if (!pixelMap || pixelMap.length !== W*H) {
+    pixelMap = buildScramMap(W, H, intensity, blockSz);
+  }
+  for (let i = 0; i < W*H; i++) {
+    const s = pixelMap[i] * 4, d4 = i*4;
+    d[d4]=src[s]; d[d4+1]=src[s+1]; d[d4+2]=src[s+2];
+  }
+  return id;
+}
+
+function buildScramMap(W, H, intensity, bsz) {
+  const total = W*H;
+  const map = new Int32Array(total);
+  for (let i=0;i<total;i++) map[i]=i;
+  const swaps = Math.floor(total * intensity * 0.5);
+  for (let i=0;i<swaps;i++) {
+    const a=Math.floor(Math.random()*total);
+    const b=Math.floor(Math.random()*total);
+    const t=map[a]; map[a]=map[b]; map[b]=t;
+  }
+  return map;
+}
+
+// DATAMOSH — blend current frame with decaying previous frame
+function fxDatamosh(id) {
+  const blend = paramVals.dm_blend / 100;
+  const glitch = paramVals.dm_glitch / 100;
+  const d = id.data;
+
+  if (!prevFrameData || prevFrameData.length !== d.length) {
+    prevFrameData = new Uint8ClampedArray(d);
+    return id;
+  }
+  for (let i = 0; i < d.length; i += 4) {
+    // occasional glitch — swap with random past pixel
+    if (Math.random() < glitch * 0.01) {
+      const off = Math.floor(Math.random() * (d.length/4)) * 4;
+      d[i]=prevFrameData[off]; d[i+1]=prevFrameData[off+1]; d[i+2]=prevFrameData[off+2];
+    } else {
+      d[i]   = d[i]   * (1-blend) + prevFrameData[i]   * blend;
+      d[i+1] = d[i+1] * (1-blend) + prevFrameData[i+1] * blend;
+      d[i+2] = d[i+2] * (1-blend) + prevFrameData[i+2] * blend;
+    }
+  }
+  // decay prev frame toward current
+  for (let i = 0; i < d.length; i += 4) {
+    prevFrameData[i]   = prevFrameData[i]   * 0.85 + d[i]   * 0.15;
+    prevFrameData[i+1] = prevFrameData[i+1] * 0.85 + d[i+1] * 0.15;
+    prevFrameData[i+2] = prevFrameData[i+2] * 0.85 + d[i+2] * 0.15;
+  }
+  return id;
+}
+
+// THERMAL — luminance → heat-map color
+function fxThermal(id) {
+  const d = id.data;
+  const shift = paramVals.th_shift;
+  const boost = paramVals.th_boost / 100;
+  for (let i = 0; i < d.length; i += 4) {
+    const lum = (d[i]*0.299 + d[i+1]*0.587 + d[i+2]*0.114) * boost;
+    const hue = ((1 - lum/255) * 240 + shift) % 360;
+    const [r,g,b] = hsl2rgb(hue, 1, Math.min(0.5, lum/255 * 0.6 + 0.05));
+    d[i]=r; d[i+1]=g; d[i+2]=b;
+  }
+  return id;
+}
+
+// ─── COLOR HELPERS ───────────────────────────────────────
+function hsl2rgb(h, s, l) {
+  h = ((h%360)+360)%360 / 360;
+  let r,g,b;
+  if (s===0) { r=g=b=l; }
+  else {
+    const q = l<0.5 ? l*(1+s) : l+s-l*s;
+    const p = 2*l-q;
+    r = hue2rgb(p,q,h+1/3);
+    g = hue2rgb(p,q,h);
+    b = hue2rgb(p,q,h-1/3);
+  }
+  return [Math.round(r*255), Math.round(g*255), Math.round(b*255)];
+}
+function hue2rgb(p,q,t) {
+  if(t<0)t+=1; if(t>1)t-=1;
+  if(t<1/6) return p+(q-p)*6*t;
+  if(t<1/2) return q;
+  if(t<2/3) return p+(q-p)*(2/3-t)*6;
+  return p;
+}
+function rgb2hsl(r,g,b) {
+  r/=255; g/=255; b/=255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b);
+  let h,s,l=(max+min)/2;
+  if(max===min){h=s=0;}
+  else{
+    const d=max-min;
+    s=l>0.5?d/(2-max-min):d/(max+min);
+    switch(max){
+      case r:h=(g-b)/d+(g<b?6:0);break;
+      case g:h=(b-r)/d+2;break;
+      default:h=(r-g)/d+4;
+    }
+    h/=6;
+  }
+  return [h,s,l];
+}
+
+// ─── EXPORT ──────────────────────────────────────────────
 async function exportVideo() {
   if (!video.src) return;
-  const btn = document.getElementById('exportBtn');
-  const prog = document.getElementById('exportProgress');
-  const fill = document.getElementById('exportFill');
-  const lbl  = document.getElementById('exportLabel');
+  const btn  = document.getElementById('expBtn');
+  const prog = document.getElementById('exprog');
+  const fill = document.getElementById('epfill');
+  const lbl  = document.getElementById('eplbl');
 
   btn.disabled = true;
   prog.classList.add('show');
 
-  const f = filters.find(x => x.id === currentFilter) || filters[0];
-  const offCanvas = document.createElement('canvas');
-  offCanvas.width  = video.videoWidth;
-  offCanvas.height = video.videoHeight;
-  const offCtx = offCanvas.getContext('2d');
+  const offCvs = document.createElement('canvas');
+  offCvs.width  = video.videoWidth;
+  offCvs.height = video.videoHeight;
+  const offCtx = offCvs.getContext('2d');
 
   let stream, recorder;
   try {
-    stream = offCanvas.captureStream(30);
+    stream   = offCvs.captureStream(fpsReduceEnabled ? targetFps : 30);
     recorder = new MediaRecorder(stream, { mimeType: 'video/webm; codecs=vp8' });
   } catch(e) {
-    lbl.textContent = 'Your browser may not support recording. Try Chrome.';
+    lbl.textContent = 'Recording not supported — use Chrome.';
     btn.disabled = false;
     return;
   }
 
   const chunks = [];
-  recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
-
+  recorder.ondataavailable = e => { if(e.data.size>0) chunks.push(e.data); };
   recorder.onstop = () => {
-    const blob = new Blob(chunks, { type: 'video/webm' });
+    const blob = new Blob(chunks, { type:'video/webm' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    const base = videoFile ? videoFile.name.replace(/\.[^.]+$/, '') : 'video';
-    a.download = base + '_bw.webm';
+    const base = videoFile ? videoFile.name.replace(/\.[^.]+$/,'') : 'video';
+    a.download = base + '_' + currentFx + '.webm';
     a.click();
     prog.classList.remove('show');
     btn.disabled = false;
     lbl.textContent = 'Done!';
-    setTimeout(() => { lbl.textContent = 'Preparing…'; }, 2000);
+    setTimeout(() => lbl.textContent = 'Preparing…', 2000);
   };
 
+  // Reset state for export
+  prevFrameData = null; pixelMap = null; frameCount = 0;
   video.currentTime = 0;
   await new Promise(r => { video.onseeked = r; });
   video.muted = true;
@@ -959,198 +852,35 @@ async function exportVideo() {
   recorder.start();
 
   const duration = video.duration;
+  const fpsInterval = fpsReduceEnabled ? 1000/targetFps : 0;
+  let lastExportFrame = 0;
 
-  function processFrame() {
+  function exportLoop(ts) {
     if (video.ended || video.currentTime >= duration) {
       video.pause();
-      recorder.stop();
+      setTimeout(() => recorder.stop(), 200);
       return;
     }
-    offCtx.drawImage(video, 0, 0, offCanvas.width, offCanvas.height);
-    let id = offCtx.getImageData(0, 0, offCanvas.width, offCanvas.height);
-    id = applyBW(id, f);
-    if (randEnabled) { frameCount++; id = applyPixelRandomizer(id); }
+    if (fpsReduceEnabled && ts - lastExportFrame < fpsInterval) {
+      requestAnimationFrame(exportLoop);
+      return;
+    }
+    lastExportFrame = ts;
+    frameCount++;
+    offCtx.drawImage(video, 0, 0, offCvs.width, offCvs.height);
+    let id = offCtx.getImageData(0, 0, offCvs.width, offCvs.height);
+    id = applyFx(id, currentFx);
     offCtx.putImageData(id, 0, 0);
     const pct = Math.round(video.currentTime / duration * 100);
     fill.style.width = pct + '%';
-    lbl.textContent  = 'Processing… ' + pct + '%';
-    requestAnimationFrame(processFrame);
+    lbl.textContent = 'Exporting… ' + pct + '%';
+    requestAnimationFrame(exportLoop);
   }
-
-  requestAnimationFrame(processFrame);
+  requestAnimationFrame(exportLoop);
 }
 
-function updateCustomFilter() {
-  const rRaw = +document.getElementById('crSlider').value;
-  const gRaw = +document.getElementById('cgSlider').value;
-  const bRaw = +document.getElementById('cbSlider').value;
-  const total = rRaw + gRaw + bRaw || 1;
-  const r = rRaw / total;
-  const g = gRaw / total;
-  const b = bRaw / total;
-  document.getElementById('crVal').textContent = r.toFixed(3);
-  document.getElementById('cgVal').textContent = g.toFixed(3);
-  document.getElementById('cbVal').textContent = b.toFixed(3);
-  document.getElementById('customSum').textContent = (r + g + b).toFixed(2);
-  const cf = filters.find(x => x.id === 'custom');
-  cf.r = r; cf.g = g; cf.b = b;
-  if (currentFilter === 'custom') {
-    const thumb = document.querySelector('[data-id="custom"] canvas');
-    if (thumb) {
-      const tctx = thumb.getContext('2d');
-      const id = tctx.getImageData(0, 0, 160, 90);
-      const sampleCtx = document.createElement('canvas');
-      sampleCtx.width = 160; sampleCtx.height = 90;
-      const sc2 = sampleCtx.getContext('2d');
-      const grd2 = sc2.createLinearGradient(0, 0, 160, 90);
-      grd2.addColorStop(0, '#3a5e8c'); grd2.addColorStop(0.5, '#c7853a'); grd2.addColorStop(1, '#5a8c4e');
-      sc2.fillStyle = grd2; sc2.fillRect(0, 0, 160, 90);
-      tctx.drawImage(sampleCtx, 0, 0);
-      const id2 = tctx.getImageData(0, 0, 160, 90);
-      const d2 = id2.data;
-      for (let i = 0; i < d2.length; i += 4) {
-        const v = Math.min(255, d2[i]*r + d2[i+1]*g + d2[i+2]*b);
-        d2[i] = d2[i+1] = d2[i+2] = v;
-      }
-      tctx.putImageData(id2, 0, 0);
-    }
-  }
-}
-
-function resetCustomFilter() {
-  document.getElementById('crSlider').value = 30;
-  document.getElementById('cgSlider').value = 59;
-  document.getElementById('cbSlider').value = 11;
-  updateCustomFilter();
-}
-
-let randEnabled = false;
-let randMode = 'full';
-let randIntensity = 0.5;
-let pixelMap = null;
-let lastMapW = 0, lastMapH = 0;
-let driftOffset = 0;
-let frameCount = 0;
-
-function toggleRandomizer() {
-  randEnabled = document.getElementById('randToggle').checked;
-  document.getElementById('randControls').classList.toggle('visible', randEnabled);
-  pixelMap = null;
-}
-
-function setRandMode(btn) {
-  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  randMode = btn.dataset.mode;
-  pixelMap = null;
-}
-
-function updateRandInt() {
-  randIntensity = document.getElementById('randIntSlider').value / 100;
-  document.getElementById('randIntVal').textContent = Math.round(randIntensity * 100) + '%';
-  pixelMap = null;
-}
-
-function reseed() {
-  pixelMap = null;
-  driftOffset = Math.random() * 10000;
-}
-
-function buildPixelMap(W, H) {
-  const total = W * H;
-  const map = new Int32Array(total);
-  for (let i = 0; i < total; i++) map[i] = i;
-
-  const intensity = randIntensity;
-
-  if (randMode === 'full') {
-    const swapCount = Math.floor(total * intensity);
-    for (let i = 0; i < swapCount; i++) {
-      const a = Math.floor(Math.random() * total);
-      const b = Math.floor(Math.random() * total);
-      const t = map[a]; map[a] = map[b]; map[b] = t;
-    }
-
-  } else if (randMode === 'region') {
-    const blockSize = Math.max(2, Math.floor(32 * (1 - intensity) + 2));
-    const cols = Math.ceil(W / blockSize);
-    const rows = Math.ceil(H / blockSize);
-    const blocks = [];
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) blocks.push([r, c]);
-    }
-    const shuffleCount = Math.floor(blocks.length * intensity);
-    for (let i = 0; i < shuffleCount; i++) {
-      const ai = Math.floor(Math.random() * blocks.length);
-      const bi = Math.floor(Math.random() * blocks.length);
-      const [ar, ac] = blocks[ai];
-      const [br, bc] = blocks[bi];
-      for (let dy = 0; dy < blockSize; dy++) {
-        for (let dx = 0; dx < blockSize; dx++) {
-          const ay = ar * blockSize + dy, ax = ac * blockSize + dx;
-          const by_ = br * blockSize + dy, bx = bc * blockSize + dx;
-          if (ay < H && ax < W && by_ < H && bx < W) {
-            const a = ay * W + ax, b = by_ * W + bx;
-            const t = map[a]; map[a] = map[b]; map[b] = t;
-          }
-        }
-      }
-    }
-
-  } else if (randMode === 'scanline') {
-    for (let y = 0; y < H; y++) {
-      if (Math.random() > intensity) continue;
-      const shift = Math.floor((Math.random() - 0.5) * W * intensity);
-      for (let x = 0; x < W; x++) {
-        const srcX = ((x + shift) % W + W) % W;
-        map[y * W + x] = y * W + srcX;
-      }
-    }
-
-  } else if (randMode === 'drift') {
-    const t = driftOffset;
-    for (let i = 0; i < total; i++) {
-      const x = i % W, y = Math.floor(i / W);
-      const angle = (Math.sin(x * 0.05 + t) + Math.cos(y * 0.05 + t)) * Math.PI;
-      const dist = intensity * 80;
-      const nx = Math.round(x + Math.cos(angle) * dist);
-      const ny = Math.round(y + Math.sin(angle) * dist);
-      if (nx >= 0 && nx < W && ny >= 0 && ny < H) {
-        map[i] = ny * W + nx;
-      }
-    }
-    driftOffset += +document.getElementById('seedSpeedSlider').value * 0.003;
-  }
-
-  return map;
-}
-
-function applyPixelRandomizer(imageData) {
-  const W = imageData.width, H = imageData.height;
-  const d = imageData.data;
-  const speed = +document.getElementById('seedSpeedSlider').value;
-
-  const needsNewMap = !pixelMap || lastMapW !== W || lastMapH !== H;
-  const isDrift = randMode === 'drift';
-  const isAnimated = isDrift || (speed > 1 && frameCount % Math.max(1, 11 - speed) === 0);
-
-  if (needsNewMap || isAnimated) {
-    pixelMap = buildPixelMap(W, H);
-    lastMapW = W; lastMapH = H;
-  }
-
-  const src = new Uint8ClampedArray(d);
-  for (let i = 0; i < W * H; i++) {
-    const srcIdx = pixelMap[i] * 4;
-    const dstIdx = i * 4;
-    d[dstIdx]   = src[srcIdx];
-    d[dstIdx+1] = src[srcIdx+1];
-    d[dstIdx+2] = src[srcIdx+2];
-  }
-  return imageData;
-}
-
-buildFilterGrid();
+// ─── INIT ────────────────────────────────────────────────
+renderParams('none');
 </script>
 </body>
 </html>
