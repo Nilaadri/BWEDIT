@@ -3,884 +3,541 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VOIDFRAME — Abstract Video Studio</title>
+<title>Dot..</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#080808;--s1:#111;--s2:#1a1a1a;--s3:#222;
-  --b1:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.12);--b3:rgba(255,255,255,0.22);
-  --txt:#f0f0f0;--muted:#666;--dim:#444;
-  --r:10px;--rs:6px;
+  --bg:#F6F6F4;--bg2:#EDEDEB;--surf:#fff;
+  --bdr:#E2E2DE;--bdr2:#C8C8C4;
+  --ink:#111;--ink2:#555;--ink3:#999;
+  --green:#1A9E5C;--r:10px;--rs:6px;
 }
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column;overflow:hidden;height:100vh}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);height:100vh;display:flex;flex-direction:column;overflow:hidden}
 
-/* HEADER */
-header{padding:14px 24px;border-bottom:0.5px solid var(--b2);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.logo{display:flex;align-items:center;gap:10px}
-.logo-mark{width:24px;height:24px;position:relative}
-.logo-mark svg{width:24px;height:24px}
-.logo-name{font-size:13px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#fff}
-.logo-sub{font-size:10px;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-left:6px}
-.header-right{display:flex;align-items:center;gap:8px}
-.pill{font-size:10px;padding:3px 8px;border-radius:20px;background:var(--s2);border:0.5px solid var(--b2);color:var(--muted);letter-spacing:0.05em;text-transform:uppercase}
+header{height:50px;padding:0 22px;display:flex;align-items:center;justify-content:space-between;background:var(--surf);border-bottom:1px solid var(--bdr);flex-shrink:0}
+.logo{display:flex;align-items:center}
+.logo-t{font-size:16px;font-weight:600;letter-spacing:-.04em;color:var(--ink)}
+.logo-ds{display:inline-flex;gap:3px;margin-left:2px;position:relative;top:1px}
+.ld{width:4.5px;height:4.5px;border-radius:50%;background:var(--ink);animation:bl 2s ease-in-out infinite}
+.ld:nth-child(2){animation-delay:.35s}
+@keyframes bl{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.18;transform:scale(.6)}}
+.hdr-r{display:flex;gap:8px;align-items:center}
+.chg{height:28px;padding:0 11px;border-radius:var(--rs);background:var(--bg2);border:1px solid var(--bdr);color:var(--ink2);font-size:11px;font-family:inherit;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .15s}
+.chg:hover{background:var(--bdr)}
+.chg svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.chg.h{display:none}
 
-/* LAYOUT */
-.main{flex:1;display:grid;grid-template-columns:1fr 300px;overflow:hidden;min-height:0}
+.main{flex:1;display:grid;grid-template-columns:1fr 310px;overflow:hidden;min-height:0}
 
-/* PREVIEW */
-.preview{display:flex;flex-direction:column;padding:20px;gap:14px;overflow:hidden;min-height:0}
-.drop-zone{flex:1;border:1px dashed var(--b2);border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer;transition:border-color .2s,background .2s;background:var(--s1);min-height:0}
-.drop-zone:hover,.drop-zone.over{border-color:var(--b3);background:var(--s2)}
-.dz-icon{width:48px;height:48px;border-radius:50%;background:var(--s2);border:0.5px solid var(--b2);display:flex;align-items:center;justify-content:center}
-.dz-icon svg{width:20px;height:20px;stroke:var(--muted);fill:none;stroke-width:1.5}
-.dz-title{font-size:14px;font-weight:500;color:var(--txt)}
-.dz-sub{font-size:12px;color:var(--muted)}
-.dz-btn{padding:7px 18px;border-radius:var(--rs);background:var(--s2);border:0.5px solid var(--b2);color:var(--txt);font-size:12px;font-weight:500;cursor:pointer;transition:background .15s}
-.dz-btn:hover{background:var(--s3)}
-#fileInput{display:none}
+.pview{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:var(--bg);position:relative;overflow:hidden}
+.dz{width:100%;height:100%;border:1.5px dashed var(--bdr2);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer;background:var(--surf);transition:border-color .2s,background .2s}
+.dz:hover,.dz.over{border-color:var(--ink3);background:var(--bg2)}
+.dzi{width:42px;height:42px;border-radius:50%;background:var(--bg2);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center}
+.dzi svg{width:17px;height:17px;stroke:var(--ink3);fill:none;stroke-width:1.5}
+.dzt{font-size:14px;font-weight:500}
+.dzs{font-size:11px;color:var(--ink3)}
+.dzb{padding:7px 16px;border-radius:var(--rs);background:var(--ink);border:none;color:#fff;font-size:11px;font-family:inherit;font-weight:500;cursor:pointer}
+.dzb:hover{opacity:.8}
 
-.video-area{flex:1;position:relative;background:#000;border-radius:var(--r);overflow:hidden;min-height:0;display:none}
-#srcVideo{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}
-#cvs{width:100%;height:100%;display:block;object-fit:contain}
-.vcontrols{position:absolute;bottom:0;left:0;right:0;padding:10px 14px;background:rgba(0,0,0,0.6);display:flex;align-items:center;gap:10px;border-top:0.5px solid rgba(255,255,255,0.06)}
-.vbtn{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.1);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
-.vbtn:hover{background:rgba(255,255,255,0.2)}
-.vbtn svg{width:14px;height:14px;fill:#fff}
-.pbar{flex:1;height:3px;background:rgba(255,255,255,0.12);border-radius:2px;cursor:pointer}
-.pfill{height:100%;background:#fff;border-radius:2px;width:0%;pointer-events:none;transition:width .05s}
-.tlbl{font-size:11px;color:rgba(255,255,255,0.5);font-variant-numeric:tabular-nums;flex-shrink:0}
+.stage{width:100%;height:100%;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.vo{position:relative;background:#000;border-radius:10px;overflow:hidden;box-shadow:0 4px 28px rgba(0,0,0,.14);transform-style:preserve-3d;transition:transform .25s}
+#pv{display:block;border-radius:10px}
+.cov{position:absolute;inset:0;display:none;cursor:crosshair;user-select:none}
+.cov.on{display:block}
+.csel{position:absolute;border:1.5px solid #fff;box-shadow:0 0 0 9999px rgba(0,0,0,.45);display:none;pointer-events:none}
 
-/* PANEL */
-.panel{border-left:0.5px solid var(--b1);overflow-y:auto;padding:0}
-.panel::-webkit-scrollbar{width:3px}
-.panel::-webkit-scrollbar-thumb{background:var(--s3)}
+.vbar{display:flex;align-items:center;gap:10px;width:100%}
+.vbtn{width:30px;height:30px;border-radius:50%;background:var(--surf);border:1px solid var(--bdr);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+.vbtn:hover{background:var(--bg2)}
+.vbtn svg{width:13px;height:13px;fill:var(--ink)}
+.vp{flex:1;height:3px;background:var(--bdr);border-radius:2px;cursor:pointer}
+.vf{height:100%;background:var(--ink);border-radius:2px;width:0%}
+.vtm{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);flex-shrink:0;min-width:72px;text-align:right}
 
-.sect{padding:16px 18px;border-bottom:0.5px solid var(--b1)}
-.sect-title{font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.proc{position:absolute;inset:0;background:rgba(246,246,244,.88);display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;border-radius:14px;z-index:30}
+.proc.on{display:flex}
+.pds{display:flex;gap:5px}
+.pd{width:6px;height:6px;border-radius:50%;background:var(--ink);animation:bl 1s ease-in-out infinite}
+.pd:nth-child(2){animation-delay:.15s}.pd:nth-child(3){animation-delay:.3s}
+.plb{font-size:11px;color:var(--ink2)}
 
-/* EFFECTS GRID */
-.fx-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.fx-card{border:0.5px solid var(--b1);border-radius:var(--rs);padding:9px 10px;cursor:pointer;transition:all .15s;background:var(--s1);position:relative}
-.fx-card:hover{border-color:var(--b2);background:var(--s2)}
-.fx-card.active{border-color:rgba(255,255,255,0.35);background:var(--s2)}
-.fx-card.active::before{content:'';position:absolute;top:7px;right:7px;width:5px;height:5px;border-radius:50%;background:#fff}
-.fx-name{font-size:11px;font-weight:600;color:var(--txt);margin-bottom:2px}
-.fx-desc{font-size:10px;color:var(--dim);line-height:1.4}
+.panel{background:var(--surf);border-left:1px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden}
+.tools{flex:1;overflow-y:auto}
+.tools::-webkit-scrollbar{width:0}
+.tool{border-bottom:1px solid var(--bdr)}
+.th{padding:13px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;transition:background .15s}
+.th:hover{background:var(--bg)}
+.thl{display:flex;align-items:center;gap:9px}
+.ti{width:26px;height:26px;border-radius:6px;background:var(--bg);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ti svg{width:12px;height:12px;stroke:var(--ink2);fill:none;stroke-width:1.8}
+.tn{font-size:12px;font-weight:500}
+.tst{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);margin-top:1px}
+.chv{width:14px;height:14px;stroke:var(--ink3);fill:none;stroke-width:2;transition:transform .2s}
+.tool.open .chv{transform:rotate(180deg)}
+.tb{display:none;padding:4px 16px 16px}
+.tool.open .tb{display:block}
 
-/* SLIDERS */
-.srow{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}
-.srow:last-child{margin-bottom:0}
-.shdr{display:flex;justify-content:space-between;align-items:center}
-.slbl{font-size:11px;color:var(--txt)}
-.sval{font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:30px;text-align:right}
-input[type=range]{-webkit-appearance:none;width:100%;height:3px;background:var(--s3);border-radius:2px;outline:none;cursor:pointer}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#fff;cursor:pointer}
+.sr{margin-bottom:12px}
+.sr:last-child{margin-bottom:0}
+.sh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
+.sl{font-size:11px;color:var(--ink2)}
+.sv{font-size:11px;font-family:'DM Mono',monospace;color:var(--ink);font-weight:500}
+input[type=range]{-webkit-appearance:none;width:100%;height:3px;background:var(--bg2);border-radius:2px;outline:none;cursor:pointer;border:none;display:block}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--ink);cursor:pointer;border:2px solid var(--surf);box-shadow:0 0 0 1px var(--bdr2)}
+input[type=range]:disabled{opacity:.3;cursor:not-allowed}
 
-/* TOGGLE */
-.trow{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.tlabel{font-size:11px;color:var(--txt)}
-.tswitch{position:relative;width:32px;height:18px;flex-shrink:0}
-.tswitch input{opacity:0;width:0;height:0}
-.ttrack{position:absolute;inset:0;background:var(--s3);border:0.5px solid var(--b2);border-radius:9px;cursor:pointer;transition:background .2s}
-.ttrack::after{content:'';position:absolute;left:3px;top:3px;width:10px;height:10px;border-radius:50%;background:var(--muted);transition:transform .2s,background .2s}
-.tswitch input:checked+.ttrack{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.35)}
-.tswitch input:checked+.ttrack::after{transform:translateX(14px);background:#fff}
+.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:4px;background:var(--bg2);border:1px solid var(--bdr);font-size:10px;font-family:'DM Mono',monospace;color:var(--ink2);margin-bottom:10px}
+.badge b{color:var(--ink);font-weight:500}
 
-/* EXPORT */
-.exp-btn{width:100%;padding:10px;border-radius:var(--rs);border:none;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:opacity .15s,transform .1s;letter-spacing:0.04em;text-transform:uppercase}
-.exp-btn.primary{background:#fff;color:#000}
-.exp-btn.secondary{background:var(--s2);color:var(--txt);border:0.5px solid var(--b2);margin-top:6px}
-.exp-btn:disabled{opacity:0.3;cursor:not-allowed}
-.exp-btn:not(:disabled):hover{opacity:0.88}
-.exp-btn:not(:disabled):active{transform:scale(0.98)}
-.exp-btn svg{width:13px;height:13px}
+.abtn{width:100%;padding:9px;border-radius:var(--rs);background:var(--ink);color:#fff;border:none;font-size:11px;font-family:inherit;font-weight:600;cursor:pointer;transition:opacity .15s,background .25s;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:5px}
+.abtn:hover{opacity:.85}
+.abtn:disabled{opacity:.3;cursor:not-allowed}
+.abtn.ok{background:var(--green)}
+.abtn svg{width:11px;height:11px;stroke:#fff;fill:none;stroke-width:2.5}
 
-.exprog{display:none;margin-top:10px}
-.exprog.show{display:block}
-.epbar{height:2px;background:var(--s3);border-radius:2px;overflow:hidden;margin-bottom:5px}
-.epfill{height:100%;background:#fff;border-radius:2px;width:0%;transition:width .1s}
-.eplbl{font-size:10px;color:var(--muted);text-align:center}
+.cbtns{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+.cb{padding:7px;border-radius:var(--rs);font-size:11px;font-family:inherit;font-weight:500;cursor:pointer;border:1px solid var(--bdr);background:var(--surf);color:var(--ink2);display:flex;align-items:center;justify-content:center;gap:4px;transition:background .15s}
+.cb:hover{background:var(--bg2)}
+.cb.full{grid-column:1/-1;background:var(--ink);color:#fff;border-color:var(--ink)}
+.cb.full:hover{opacity:.85}
+.cb.full:disabled{opacity:.3;cursor:not-allowed}
+.cb svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2}
+.cinf{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);margin-top:8px;min-height:14px}
 
-.finfo{background:var(--s2);border-radius:var(--rs);padding:8px 12px;display:none;gap:8px;align-items:center;margin-bottom:10px}
-.finfo.show{display:flex}
-.finfo-icon svg{width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:1.5}
-.finfo-name{font-size:11px;color:var(--txt);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.finfo-sz{font-size:10px;color:var(--muted)}
+.axrow{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.axl{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);width:16px;flex-shrink:0}
+.axc{flex:1}
+.ax2{display:flex;gap:6px;margin-top:4px}
+.ax2b{flex:1;padding:7px;border-radius:var(--rs);font-size:11px;font-family:inherit;font-weight:500;cursor:pointer;border:1px solid var(--bdr);background:var(--bg);color:var(--ink2);transition:background .15s;text-align:center}
+.ax2b:hover{background:var(--bg2)}
 
-select{width:100%;background:var(--s2);border:0.5px solid var(--b2);color:var(--txt);font-size:11px;padding:6px 8px;border-radius:var(--rs);outline:none;cursor:pointer;-webkit-appearance:none;appearance:none}
-select:focus{border-color:var(--b3)}
+.note{font-size:10px;color:var(--ink3);line-height:1.6;margin-top:6px}
 
-.fx-params{display:none;margin-top:12px}
-.fx-params.show{display:block}
-
-.note{font-size:10px;color:var(--dim);line-height:1.5;margin-top:6px}
+.exps{padding:14px 16px;border-top:1px solid var(--bdr);flex-shrink:0}
+.expbtn{width:100%;padding:10px;border-radius:var(--rs);background:var(--ink);color:#fff;border:none;font-size:12px;font-family:inherit;font-weight:600;cursor:pointer;transition:opacity .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.expbtn:disabled{opacity:.3;cursor:not-allowed}
+.expbtn:not(:disabled):hover{opacity:.85}
+.expbtn svg{width:13px;height:13px}
+.eprog{display:none;margin-top:9px}
+.eprog.on{display:block}
+.epbar{height:2px;background:var(--bg2);border-radius:2px;overflow:hidden;margin-bottom:5px}
+.epf{height:100%;background:var(--ink);border-radius:2px;width:0%}
+.epl{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);text-align:center}
 </style>
 </head>
 <body>
 
 <header>
   <div class="logo">
-    <div class="logo-mark">
-      <svg viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="10" stroke="#444" stroke-width="0.5"/>
-        <circle cx="12" cy="12" r="10" stroke="url(#lg)" stroke-width="1.5" stroke-dasharray="3 2"/>
-        <circle cx="12" cy="12" r="4" fill="#fff" opacity="0.9"/>
-        <circle cx="12" cy="12" r="2" fill="#000"/>
-        <defs><linearGradient id="lg" x1="0" y1="0" x2="24" y2="24"><stop offset="0%" stop-color="#ff6b35"/><stop offset="50%" stop-color="#a855f7"/><stop offset="100%" stop-color="#3b82f6"/></linearGradient></defs>
-      </svg>
-    </div>
-    <span class="logo-name">Voidframe<span class="logo-sub">Abstract Studio</span></span>
+    <span class="logo-t">Dot</span>
+    <span class="logo-ds"><span class="ld"></span><span class="ld"></span></span>
   </div>
-  <div class="header-right">
-    <span class="pill">Canvas</span>
+  <div class="hdr-r">
+    <button class="chg h" id="chgBtn" onclick="document.getElementById('fi').click()">
+      <svg viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+      Change video
+    </button>
   </div>
 </header>
 
 <div class="main">
-  <div class="preview">
-
-    <div class="drop-zone" id="dropZone">
-      <div class="dz-icon">
-        <svg viewBox="0 0 24 24"><path d="M15 10l4.553-2.277A1 1 0 0121 8.57v6.858a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
-      </div>
-      <p class="dz-title">Drop video here</p>
-      <p class="dz-sub">MP4, WebM, MOV</p>
-      <button class="dz-btn" onclick="document.getElementById('fileInput').click()">Choose file</button>
-      <input type="file" id="fileInput" accept="video/*">
+  <div class="pview" id="pview">
+    <div class="proc" id="proc">
+      <div class="pds"><div class="pd"></div><div class="pd"></div><div class="pd"></div></div>
+      <span class="plb" id="plb">Applying…</span>
     </div>
 
-    <div class="video-area" id="videoArea">
-      <video id="srcVideo" playsinline></video>
-      <canvas id="cvs"></canvas>
-      <div class="vcontrols">
-        <button class="vbtn" onclick="togglePlay()">
-          <svg id="playIco" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-        </button>
-        <div class="pbar" id="pbar" onclick="seek(event)">
-          <div class="pfill" id="pfill"></div>
+    <div class="dz" id="dz">
+      <div class="dzi"><svg viewBox="0 0 24 24"><path d="M15 10l4.553-2.277A1 1 0 0121 8.57v6.858a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg></div>
+      <p class="dzt">Drop a video to start</p>
+      <p class="dzs">MP4, WebM, MOV</p>
+      <button class="dzb" onclick="document.getElementById('fi').click()">Browse files</button>
+    </div>
+
+    <div class="stage" id="stage">
+      <div class="vo" id="vo">
+        <video id="pv" playsinline></video>
+        <div class="cov" id="cov">
+          <div class="csel" id="csel"></div>
         </div>
-        <span class="tlbl" id="tlbl">0:00 / 0:00</span>
+      </div>
+      <div class="vbar">
+        <button class="vbtn" onclick="togglePlay()">
+          <svg id="pico" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div class="vp" id="vp" onclick="seekV(event)">
+          <div class="vf" id="vf"></div>
+        </div>
+        <span class="vtm" id="vtm">0:00 / 0:00</span>
       </div>
     </div>
 
+    <input type="file" id="fi" accept="video/*">
   </div>
 
   <div class="panel">
+    <div class="tools">
 
-    <!-- EFFECTS -->
-    <div class="sect">
-      <p class="sect-title">Effect</p>
-      <div class="fx-grid" id="fxGrid">
-
-        <div class="fx-card active" data-fx="none" onclick="setFx(this)">
-          <p class="fx-name">None</p>
-          <p class="fx-desc">Raw video, no processing</p>
-        </div>
-
-        <div class="fx-card" data-fx="bw" onclick="setFx(this)">
-          <p class="fx-name">B&W</p>
-          <p class="fx-desc">Classic monochrome</p>
-        </div>
-
-        <div class="fx-card" data-fx="edgeburn" onclick="setFx(this)">
-          <p class="fx-name">Edge Burn</p>
-          <p class="fx-desc">Glowing outlines on dark</p>
-        </div>
-
-        <div class="fx-card" data-fx="kaleid" onclick="setFx(this)">
-          <p class="fx-name">Kaleidoscope</p>
-          <p class="fx-desc">Mirrored symmetry fold</p>
-        </div>
-
-        <div class="fx-card" data-fx="chroma" onclick="setFx(this)">
-          <p class="fx-name">Chroma Split</p>
-          <p class="fx-desc">RGB channel separation</p>
-        </div>
-
-        <div class="fx-card" data-fx="scribble" onclick="setFx(this)">
-          <p class="fx-name">Scribble Field</p>
-          <p class="fx-desc">Vertical line energy</p>
-        </div>
-
-        <div class="fx-card" data-fx="colorflood" onclick="setFx(this)">
-          <p class="fx-name">Color Flood</p>
-          <p class="fx-desc">Deep hue saturation bleed</p>
-        </div>
-
-        <div class="fx-card" data-fx="pixelscram" onclick="setFx(this)">
-          <p class="fx-name">Pixel Chaos</p>
-          <p class="fx-desc">Random pixel displacement</p>
-        </div>
-
-        <div class="fx-card" data-fx="datamosh" onclick="setFx(this)">
-          <p class="fx-name">Datamosh</p>
-          <p class="fx-desc">Frame echo smearing</p>
-        </div>
-
-        <div class="fx-card" data-fx="thermal" onclick="setFx(this)">
-          <p class="fx-name">Thermal</p>
-          <p class="fx-desc">Heat-map color mapping</p>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- FX PARAMS -->
-    <div class="sect" id="paramsSection">
-      <p class="sect-title">Parameters</p>
-      <div id="paramsBody">
-        <p style="font-size:11px;color:var(--dim)">No parameters for this effect.</p>
-      </div>
-    </div>
-
-    <!-- FRAME RATE REDUCER -->
-    <div class="sect">
-      <p class="sect-title">Frame Rate</p>
-      <div class="trow">
-        <div>
-          <span class="tlabel">Reduce frame rate</span>
-          <p style="font-size:10px;color:var(--dim);margin-top:2px">Source: <span id="fpsSource">— fps</span></p>
-        </div>
-        <label class="tswitch"><input type="checkbox" id="fpsToggle" onchange="updateFps()"><span class="ttrack"></span></label>
-      </div>
-      <div id="fpsControls" style="display:none">
-        <div class="srow">
-          <div class="shdr">
-            <span class="slbl">Target FPS</span>
-            <span class="sval" id="fpsVal">— fps</span>
+      <div class="tool" id="tFps">
+        <div class="th" onclick="tog('tFps')">
+          <div class="thl">
+            <div class="ti"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 6 12 12 15.5 15.5"/></svg></div>
+            <div><p class="tn">Frame Rate</p><p class="tst" id="fpsS">Load a video first</p></div>
           </div>
-          <input type="range" min="1" max="29" value="12" id="fpsSlider" oninput="updateFpsVal()">
+          <svg class="chv" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
-        <p class="note">Always below source FPS. Lower values give a choppy, stop-motion feel.</p>
+        <div class="tb">
+          <div class="badge" id="fpsB" style="display:none">Source &nbsp;<b id="fpsSrc">—</b>&nbsp; fps</div>
+          <div class="sr">
+            <div class="sh"><span class="sl">Target frame rate</span><span class="sv" id="fpsV">—</span></div>
+            <input type="range" id="fpsR" min="1" max="29" value="12" disabled oninput="onFps()">
+          </div>
+          <p class="note">Capped 1 below source FPS. Lower = choppier, stop-motion feel.</p>
+          <button class="abtn" id="apFps" disabled onclick="doFps()">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            Apply &amp; preview
+          </button>
+        </div>
       </div>
+
+      <div class="tool" id="tCrop">
+        <div class="th" onclick="tog('tCrop')">
+          <div class="thl">
+            <div class="ti"><svg viewBox="0 0 24 24"><polyline points="6 2 6 6 2 6"/><polyline points="18 2 18 6 22 6"/><polyline points="6 22 6 18 2 18"/><polyline points="18 22 18 18 22 18"/><rect x="6" y="6" width="12" height="12"/></svg></div>
+            <div><p class="tn">Crop</p><p class="tst" id="cropS">Load a video first</p></div>
+          </div>
+          <svg class="chv" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="tb">
+          <p class="note" style="margin-top:0;margin-bottom:8px">Draw a selection directly on the video preview, then apply.</p>
+          <div class="cbtns">
+            <button class="cb" id="selBtn" onclick="startCrop()">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+              Select area
+            </button>
+            <button class="cb" id="rstBtn" onclick="resetCrop()" style="display:none">
+              <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
+              Reset crop
+            </button>
+            <button class="cb full" id="apCrop" disabled onclick="doApplyCrop()">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              Apply crop &amp; preview
+            </button>
+          </div>
+          <p class="cinf" id="cinf"></p>
+        </div>
+      </div>
+
+      <div class="tool" id="t3d">
+        <div class="th" onclick="tog('t3d')">
+          <div class="thl">
+            <div class="ti"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+            <div><p class="tn">3D Alignment</p><p class="tst" id="tdS">X · Y · Z + perspective</p></div>
+          </div>
+          <svg class="chv" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="tb">
+          <div class="axrow">
+            <span class="axl">X</span>
+            <div class="axc">
+              <div class="sh"><span class="sl">Tilt (up / down)</span><span class="sv" id="rxV">0°</span></div>
+              <input type="range" id="rxR" min="-50" max="50" value="0" oninput="on3d()">
+            </div>
+          </div>
+          <div class="axrow">
+            <span class="axl">Y</span>
+            <div class="axc">
+              <div class="sh"><span class="sl">Pan (left / right)</span><span class="sv" id="ryV">0°</span></div>
+              <input type="range" id="ryR" min="-50" max="50" value="0" oninput="on3d()">
+            </div>
+          </div>
+          <div class="axrow">
+            <span class="axl">Z</span>
+            <div class="axc">
+              <div class="sh"><span class="sl">Roll (clockwise)</span><span class="sv" id="rzV">0°</span></div>
+              <input type="range" id="rzR" min="-45" max="45" value="0" oninput="on3d()">
+            </div>
+          </div>
+          <div class="axrow" style="margin-bottom:0">
+            <span class="axl" style="font-size:9px;line-height:1.2">FOV</span>
+            <div class="axc">
+              <div class="sh"><span class="sl">Perspective depth</span><span class="sv" id="pvV">600px</span></div>
+              <input type="range" id="pvR" min="100" max="1400" value="600" oninput="on3d()">
+            </div>
+          </div>
+          <div class="ax2">
+            <button class="ax2b" onclick="reset3d()">Reset</button>
+            <button class="abtn" style="margin-top:0;flex:2" onclick="doApply3d()">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              Apply &amp; preview
+            </button>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- EXPORT -->
-    <div class="sect">
-      <p class="sect-title">Export</p>
-      <div class="finfo" id="finfo">
-        <span class="finfo-icon"><svg viewBox="0 0 24 24"><path d="M15 10l4.553-2.277A1 1 0 0121 8.57v6.858a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg></span>
-        <div>
-          <p class="finfo-name" id="finfoName">—</p>
-          <p class="finfo-sz" id="finfoSz">—</p>
-        </div>
-      </div>
-      <button class="exp-btn primary" id="expBtn" disabled onclick="exportVideo()">
+    <div class="exps">
+      <button class="expbtn" id="expBtn" disabled onclick="exportV()">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg>
-        Export with effect
+        Export video
       </button>
-      <div class="exprog" id="exprog">
-        <div class="epbar"><div class="epfill" id="epfill"></div></div>
-        <p class="eplbl" id="eplbl">Preparing…</p>
+      <div class="eprog" id="eprog">
+        <div class="epbar"><div class="epf" id="epf"></div></div>
+        <p class="epl" id="epl">Preparing…</p>
       </div>
-      <p class="note" style="margin-top:8px">Exports as WebM. Use Chrome for best results.</p>
+      <p class="note">Exports as WebM. Use Chrome for best results.</p>
     </div>
-
   </div>
 </div>
 
 <script>
-// ─── STATE ───────────────────────────────────────────────
-const video = document.getElementById('srcVideo');
-const cvs   = document.getElementById('cvs');
-const ctx   = cvs.getContext('2d');
-let currentFx = 'none';
-let raf = null;
-let videoFile = null;
-let fpsReduceEnabled = false;
-let targetFps = 12;
-let videoFps = 30;
-let lastFrameTime = 0;
-let prevFrameData = null;
-let moshBlend = 0;
-let pixelMap = null;
-let frameCount = 0;
+const vid=document.getElementById('pv');
+const vo=document.getElementById('vo');
+const cov=document.getElementById('cov');
+const csel=document.getElementById('csel');
+let vFile=null,vFps=30,tgtFps=15;
+let cropRect=null,cropPx=null,appliedCrop=null,appliedFps=null;
+let isCropping=false,cropStart=null;
+let tilt={rx:0,ry:0,rz:0,p:600};
 
-// ─── FX PARAMS DEFINITIONS ──────────────────────────────
-const fxParams = {
-  none: [],
-  bw:   [{ id:'bw_contrast', label:'Contrast', min:50, max:200, val:100 }],
-  edgeburn: [
-    { id:'eb_thresh', label:'Edge threshold', min:10, max:80, val:30 },
-    { id:'eb_glow',   label:'Glow intensity', min:1,  max:5,  val:2  },
-  ],
-  kaleid: [
-    { id:'kl_segs',  label:'Segments',  min:2, max:16, val:4 },
-    { id:'kl_rot',   label:'Rotation speed', min:0, max:10, val:2 },
-  ],
-  chroma: [
-    { id:'ch_shift', label:'Channel shift', min:1, max:40, val:10 },
-    { id:'ch_angle', label:'Angle',         min:0, max:360, val:0  },
-  ],
-  scribble: [
-    { id:'sc_dens',  label:'Density',   min:1,  max:20,  val:8  },
-    { id:'sc_amp',   label:'Amplitude', min:5,  max:100, val:30 },
-    { id:'sc_speed', label:'Speed',     min:1,  max:10,  val:4  },
-  ],
-  colorflood: [
-    { id:'cf_sat',   label:'Saturation boost', min:100, max:400, val:200 },
-    { id:'cf_hrot',  label:'Hue rotate',        min:0,   max:360, val:0   },
-    { id:'cf_bleed', label:'Bleed amount',       min:0,   max:20,  val:5   },
-  ],
-  pixelscram: [
-    { id:'ps_int',   label:'Intensity',   min:1,  max:100, val:40  },
-    { id:'ps_block', label:'Block size',  min:1,  max:30,  val:1   },
-  ],
-  datamosh: [
-    { id:'dm_blend', label:'Echo blend',  min:5,  max:95,  val:40 },
-    { id:'dm_glitch',label:'Glitch rate', min:0,  max:100, val:20 },
-  ],
-  thermal: [
-    { id:'th_shift', label:'Color shift', min:0, max:360, val:0 },
-    { id:'th_boost', label:'Intensity',   min:50, max:200, val:100 },
-  ],
-};
+function tog(id){
+  const el=document.getElementById(id),was=el.classList.contains('open');
+  document.querySelectorAll('.tool').forEach(t=>t.classList.remove('open'));
+  if(!was)el.classList.add('open');
+}
 
-const paramVals = {};
-Object.entries(fxParams).forEach(([fx, params]) => {
-  params.forEach(p => { paramVals[p.id] = p.val; });
+const dz=document.getElementById('dz');
+const fi=document.getElementById('fi');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('over')});
+dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('over');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('video/'))loadV(f)});
+fi.addEventListener('change',()=>{if(fi.files[0])loadV(fi.files[0])});
+dz.addEventListener('click',e=>{if(e.target===dz)fi.click()});
+
+function loadV(file){
+  vFile=file;appliedCrop=null;appliedFps=null;cropRect=null;cropPx=null;
+  resetCropUI();reset3dUI();
+  vid.src=URL.createObjectURL(file);
+  vid.onloadedmetadata=()=>{
+    dz.style.display='none';
+    document.getElementById('stage').style.display='flex';
+    document.getElementById('chgBtn').classList.remove('h');
+    document.getElementById('expBtn').disabled=false;
+    document.getElementById('cropS').textContent=vid.videoWidth+'×'+vid.videoHeight;
+    sizeVO();detectFps();
+  };
+  vid.ontimeupdate=()=>{
+    document.getElementById('vf').style.width=(vid.currentTime/vid.duration*100)+'%';
+    document.getElementById('vtm').textContent=fmt(vid.currentTime)+' / '+fmt(vid.duration);
+  };
+  vid.onended=()=>{document.getElementById('pico').innerHTML='<path d="M8 5v14l11-7z"/>'};
+}
+
+function sizeVO(){
+  const pw=document.getElementById('pview');
+  const mw=pw.clientWidth-48,mh=pw.clientHeight-72;
+  const r=vid.videoWidth/vid.videoHeight;
+  let w=mw,h=mw/r;if(h>mh){h=mh;w=h*r;}
+  vo.style.width=w+'px';vo.style.height=h+'px';
+  vid.style.width=w+'px';vid.style.height=h+'px';
+}
+window.addEventListener('resize',()=>{if(vid.videoWidth)sizeVO()});
+function fmt(s){s=isNaN(s)||!isFinite(s)?0:s;return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0')}
+function togglePlay(){if(!vid.src)return;if(vid.paused){vid.play();document.getElementById('pico').innerHTML='<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';}else{vid.pause();document.getElementById('pico').innerHTML='<path d="M8 5v14l11-7z"/>';}}
+function seekV(e){const r=document.getElementById('vp').getBoundingClientRect();vid.currentTime=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*vid.duration}
+
+function detectFps(){
+  let det=30;
+  if(vid.requestVideoFrameCallback){
+    const ts=[];
+    function samp(now,m){
+      ts.push(m.mediaTime);
+      if(ts.length<6){vid.requestVideoFrameCallback(samp);return;}
+      const diffs=[];for(let i=1;i<ts.length;i++)diffs.push(ts[i]-ts[i-1]);
+      const avg=diffs.reduce((a,b)=>a+b,0)/diffs.length;
+      const fps=Math.round(1/avg);if(fps>0&&fps<300)det=fps;
+      vFps=det;setFpsUI();
+    }
+    vid.play().then(()=>{vid.requestVideoFrameCallback(samp);setTimeout(()=>{vid.pause();vid.currentTime=0;},900)});
+  }else{vFps=det;setFpsUI();}
+}
+
+function setFpsUI(){
+  document.getElementById('fpsB').style.display='inline-flex';
+  document.getElementById('fpsSrc').textContent=vFps;
+  const sl=document.getElementById('fpsR');
+  const mx=Math.max(1,vFps-1);sl.max=mx;
+  tgtFps=Math.max(1,Math.min(mx,Math.round(vFps/2)));
+  sl.value=tgtFps;sl.disabled=false;
+  document.getElementById('fpsV').textContent=tgtFps+' fps';
+  document.getElementById('fpsS').textContent='Source: '+vFps+' fps';
+  document.getElementById('apFps').disabled=false;
+}
+
+function onFps(){
+  tgtFps=Math.min(+document.getElementById('fpsR').value,vFps-1);
+  document.getElementById('fpsR').value=tgtFps;
+  document.getElementById('fpsV').textContent=tgtFps+' fps';
+}
+
+function doFps(){
+  appliedFps=tgtFps;
+  document.getElementById('fpsS').textContent=vFps+' → '+tgtFps+' fps';
+  flash('apFps','Frame rate applied');
+  showProc('Updating frame rate…',600);
+}
+
+function startCrop(){
+  if(!vid.src)return;
+  isCropping=true;cov.classList.add('on');csel.style.display='none';
+  document.getElementById('selBtn').textContent='Drawing…';
+  document.getElementById('cinf').textContent='Click and drag on the video';
+}
+
+cov.addEventListener('mousedown',e=>{
+  if(!isCropping)return;
+  const r=vo.getBoundingClientRect();
+  cropStart={x:e.clientX-r.left,y:e.clientY-r.top};
+  csel.style.display='block';
+  Object.assign(csel.style,{left:cropStart.x+'px',top:cropStart.y+'px',width:'0',height:'0'});
+});
+cov.addEventListener('mousemove',e=>{
+  if(!isCropping||!cropStart)return;
+  const r=vo.getBoundingClientRect();
+  const cx=e.clientX-r.left,cy=e.clientY-r.top;
+  const x=Math.min(cx,cropStart.x),y=Math.min(cy,cropStart.y);
+  const w=Math.abs(cx-cropStart.x),h=Math.abs(cy-cropStart.y);
+  Object.assign(csel.style,{left:x+'px',top:y+'px',width:w+'px',height:h+'px'});
+  cropPx={x,y,w,h};
+  const sx=vid.videoWidth/vo.clientWidth,sy=vid.videoHeight/vo.clientHeight;
+  document.getElementById('cinf').textContent=Math.round(w*sx)+' × '+Math.round(h*sy)+' px';
+});
+cov.addEventListener('mouseup',()=>{
+  if(!isCropping||!cropStart)return;
+  isCropping=false;cropStart=null;
+  if(cropPx&&cropPx.w>5&&cropPx.h>5){
+    const sx=vid.videoWidth/vo.clientWidth,sy=vid.videoHeight/vo.clientHeight;
+    cropRect={x:Math.round(cropPx.x*sx),y:Math.round(cropPx.y*sy),w:Math.round(cropPx.w*sx),h:Math.round(cropPx.h*sy)};
+    document.getElementById('apCrop').disabled=false;
+    document.getElementById('rstBtn').style.display='';
+    document.getElementById('selBtn').textContent='Redraw';
+    document.getElementById('cinf').textContent=cropRect.w+'×'+cropRect.h+' at ('+cropRect.x+', '+cropRect.y+')';
+  }else resetCropUI();
+  cov.classList.remove('on');
 });
 
-function setFx(card) {
-  document.querySelectorAll('.fx-card').forEach(c => c.classList.remove('active'));
-  card.classList.add('active');
-  currentFx = card.dataset.fx;
-  pixelMap = null;
-  prevFrameData = null;
-  renderParams(currentFx);
+function doApplyCrop(){
+  if(!cropRect)return;
+  appliedCrop={...cropRect};
+  const vw=vo.clientWidth,vh=vo.clientHeight;
+  const sx=vw/vid.videoWidth,sy=vh/vid.videoHeight;
+  const dx=appliedCrop.x*sx,dy=appliedCrop.y*sy;
+  const cw=appliedCrop.w*sx,ch=appliedCrop.h*sy;
+  vo.style.width=cw+'px';vo.style.height=ch+'px';
+  Object.assign(vid.style,{position:'absolute',width:vw+'px',height:vh+'px',left:-dx+'px',top:-dy+'px'});
+  csel.style.display='none';
+  document.getElementById('apCrop').disabled=true;
+  document.getElementById('cropS').textContent=appliedCrop.w+'×'+appliedCrop.h+' px';
+  document.getElementById('cinf').textContent='Preview showing cropped region';
+  showProc('Applying crop…',600);
 }
 
-function renderParams(fx) {
-  const params = fxParams[fx] || [];
-  const body = document.getElementById('paramsBody');
-  if (!params.length) {
-    body.innerHTML = '<p style="font-size:11px;color:var(--dim)">No parameters for this effect.</p>';
-    return;
-  }
-  body.innerHTML = params.map(p => `
-    <div class="srow">
-      <div class="shdr">
-        <span class="slbl">${p.label}</span>
-        <span class="sval" id="sv_${p.id}">${paramVals[p.id]}</span>
-      </div>
-      <input type="range" min="${p.min}" max="${p.max}" value="${paramVals[p.id]}"
-        oninput="paramVals['${p.id}']=+this.value;document.getElementById('sv_${p.id}').textContent=this.value;pixelMap=null;">
-    </div>
-  `).join('');
+function resetCrop(){
+  appliedCrop=null;cropRect=null;cropPx=null;resetCropUI();sizeVO();
+  Object.assign(vid.style,{position:'',left:'',top:''});
+  document.getElementById('cropS').textContent=vid.videoWidth+'×'+vid.videoHeight;
+}
+function resetCropUI(){
+  isCropping=false;cropStart=null;csel.style.display='none';cov.classList.remove('on');
+  document.getElementById('selBtn').textContent='Select area';
+  document.getElementById('rstBtn').style.display='none';
+  document.getElementById('apCrop').disabled=true;
+  document.getElementById('cinf').textContent='';
 }
 
-// ─── DROP / LOAD ─────────────────────────────────────────
-const dropZone = document.getElementById('dropZone');
-const fileInput = document.getElementById('fileInput');
+function on3d(){
+  tilt.rx=+document.getElementById('rxR').value;
+  tilt.ry=+document.getElementById('ryR').value;
+  tilt.rz=+document.getElementById('rzR').value;
+  tilt.p= +document.getElementById('pvR').value;
+  document.getElementById('rxV').textContent=tilt.rx+'°';
+  document.getElementById('ryV').textContent=tilt.ry+'°';
+  document.getElementById('rzV').textContent=tilt.rz+'°';
+  document.getElementById('pvV').textContent=tilt.p+'px';
+  document.getElementById('pview').style.perspective=tilt.p+'px';
+  vo.style.transform=`rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) rotateZ(${tilt.rz}deg)`;
+}
+function doApply3d(){
+  document.getElementById('tdS').textContent=`X:${tilt.rx}° Y:${tilt.ry}° Z:${tilt.rz}°`;
+  showProc('Applying 3D transform…',500);
+}
+function reset3d(){
+  ['rxR','ryR','rzR'].forEach(id=>document.getElementById(id).value=0);
+  document.getElementById('pvR').value=600;
+  tilt={rx:0,ry:0,rz:0,p:600};
+  document.getElementById('rxV').textContent='0°';
+  document.getElementById('ryV').textContent='0°';
+  document.getElementById('rzV').textContent='0°';
+  document.getElementById('pvV').textContent='600px';
+  document.getElementById('tdS').textContent='X · Y · Z + perspective';
+  document.getElementById('pview').style.perspective='';
+  vo.style.transform='';
+}
+function reset3dUI(){reset3d();}
 
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('over'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('over'));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault(); dropZone.classList.remove('over');
-  const f = e.dataTransfer.files[0];
-  if (f && f.type.startsWith('video/')) loadVideo(f);
-});
-fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadVideo(fileInput.files[0]); });
-dropZone.addEventListener('click', e => { if (e.target === dropZone) fileInput.click(); });
-
-function loadVideo(file) {
-  videoFile = file;
-  video.src = URL.createObjectURL(file);
-  video.onloadedmetadata = () => {
-    cvs.width  = video.videoWidth;
-    cvs.height = video.videoHeight;
-    dropZone.style.display = 'none';
-    document.getElementById('videoArea').style.display = 'block';
-    document.getElementById('finfo').classList.add('show');
-    document.getElementById('finfoName').textContent = file.name;
-    document.getElementById('finfoSz').textContent   = (file.size/1024/1024).toFixed(1) + ' MB';
-    document.getElementById('expBtn').disabled = false;
-    prevFrameData = null; pixelMap = null;
-    video.currentTime = 0.01;
-    video.onseeked = () => { drawFrame(); video.onseeked = null; };
-    detectFps(video);
-  };
-  video.ontimeupdate = () => {
-    const pct = video.currentTime / video.duration * 100;
-    document.getElementById('pfill').style.width = pct + '%';
-    document.getElementById('tlbl').textContent = fmt(video.currentTime) + ' / ' + fmt(video.duration);
-  };
-  video.onended = () => { document.getElementById('playIco').innerHTML = '<path d="M8 5v14l11-7z"/>'; };
+function showProc(msg,ms){
+  const el=document.getElementById('proc');
+  document.getElementById('plb').textContent=msg;
+  el.classList.add('on');setTimeout(()=>el.classList.remove('on'),ms);
+}
+function flash(id,msg){
+  const b=document.getElementById(id);const orig=b.innerHTML;
+  b.classList.add('ok');b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> '+msg;
+  setTimeout(()=>{b.classList.remove('ok');b.innerHTML=orig;},1800);
 }
 
-function fmt(s) {
-  s = isNaN(s) ? 0 : s;
-  return Math.floor(s/60) + ':' + String(Math.floor(s%60)).padStart(2,'0');
-}
-
-function togglePlay() {
-  if (!video.src) return;
-  if (video.paused) {
-    video.play();
-    document.getElementById('playIco').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
-    raf = requestAnimationFrame(loop);
-  } else {
-    video.pause();
-    document.getElementById('playIco').innerHTML = '<path d="M8 5v14l11-7z"/>';
-    cancelAnimationFrame(raf);
-  }
-}
-
-function seek(e) {
-  const r = document.getElementById('pbar').getBoundingClientRect();
-  video.currentTime = Math.max(0, Math.min(1, (e.clientX - r.left)/r.width)) * video.duration;
-  video.onseeked = () => { drawFrame(); };
-}
-
-// ─── FPS CONTROL ─────────────────────────────────────────
-function detectFps(v) {
-  // Try to read frame rate from video track
-  let detected = 30;
-  if (v.videoTracks && v.videoTracks[0] && v.videoTracks[0].getSettings) {
-    const s = v.videoTracks[0].getSettings();
-    if (s.frameRate) detected = Math.round(s.frameRate);
-  }
-  videoFps = detected;
-
-  // Count frames over a short window as fallback / confirmation
-  let frames = 0;
-  const startTime = performance.now();
-  function countFrame() {
-    frames++;
-    const elapsed = performance.now() - startTime;
-    if (elapsed < 500) {
-      v.requestVideoFrameCallback ? v.requestVideoFrameCallback(countFrame) : null;
-    } else {
-      const measured = Math.round(frames / (elapsed / 1000));
-      if (measured > 1 && measured < 200) videoFps = measured;
-      updateFpsSliderBounds();
-    }
-  }
-  if (v.requestVideoFrameCallback) {
-    v.requestVideoFrameCallback(countFrame);
-  } else {
-    updateFpsSliderBounds();
-  }
-}
-
-function updateFpsSliderBounds() {
-  const slider = document.getElementById('fpsSlider');
-  // Max is always strictly less than source FPS — at least 1 below
-  const maxAllowed = Math.max(1, videoFps - 1);
-  // Default target = half the source fps, clamped to [1, maxAllowed]
-  const defaultTarget = Math.max(1, Math.min(maxAllowed, Math.round(videoFps / 2)));
-  slider.max   = maxAllowed;
-  slider.value = defaultTarget;
-  targetFps    = defaultTarget;
-  document.getElementById('fpsVal').textContent   = targetFps + ' fps';
-  document.getElementById('fpsSource').textContent = videoFps + ' fps';
-}
-
-function updateFps() {
-  fpsReduceEnabled = document.getElementById('fpsToggle').checked;
-  document.getElementById('fpsControls').style.display = fpsReduceEnabled ? 'block' : 'none';
-}
-
-function updateFpsVal() {
-  targetFps = +document.getElementById('fpsSlider').value;
-  // Hard enforce: never allow target >= source
-  if (targetFps >= videoFps) {
-    targetFps = videoFps - 1;
-    document.getElementById('fpsSlider').value = targetFps;
-  }
-  document.getElementById('fpsVal').textContent = targetFps + ' fps';
-}
-
-// ─── RENDER LOOP ─────────────────────────────────────────
-function loop(ts) {
-  if (video.paused || video.ended) return;
-  if (fpsReduceEnabled) {
-    const interval = 1000 / targetFps;
-    if (ts - lastFrameTime < interval) { raf = requestAnimationFrame(loop); return; }
-    lastFrameTime = ts;
-  }
-  frameCount++;
-  drawFrame();
-  raf = requestAnimationFrame(loop);
-}
-
-function drawFrame() {
-  ctx.drawImage(video, 0, 0, cvs.width, cvs.height);
-  let id = ctx.getImageData(0, 0, cvs.width, cvs.height);
-  id = applyFx(id, currentFx);
-  ctx.putImageData(id, 0, 0);
-}
-
-// ─── EFFECTS ─────────────────────────────────────────────
-function applyFx(id, fx) {
-  switch(fx) {
-    case 'bw':         return fxBW(id);
-    case 'edgeburn':   return fxEdgeBurn(id);
-    case 'kaleid':     return fxKaleid(id);
-    case 'chroma':     return fxChroma(id);
-    case 'scribble':   return fxScribble(id);
-    case 'colorflood': return fxColorFlood(id);
-    case 'pixelscram': return fxPixelScram(id);
-    case 'datamosh':   return fxDatamosh(id);
-    case 'thermal':    return fxThermal(id);
-    default:           return id;
-  }
-}
-
-// B&W
-function fxBW(id) {
-  const d = id.data;
-  const c = paramVals.bw_contrast / 100;
-  for (let i = 0; i < d.length; i += 4) {
-    let v = d[i]*0.299 + d[i+1]*0.587 + d[i+2]*0.114;
-    v = (v - 128)*c + 128;
-    d[i] = d[i+1] = d[i+2] = Math.max(0, Math.min(255, v));
-  }
-  return id;
-}
-
-// EDGE BURN — extract luminance edges, invert to bright-on-black, glow
-function fxEdgeBurn(id) {
-  const W = id.width, H = id.height;
-  const d = id.data;
-  const thresh = paramVals.eb_thresh;
-  const glow   = paramVals.eb_glow;
-  const gray = new Float32Array(W * H);
-  for (let i = 0; i < W*H; i++) {
-    gray[i] = d[i*4]*0.299 + d[i*4+1]*0.587 + d[i*4+2]*0.114;
-  }
-  for (let y = 1; y < H-1; y++) {
-    for (let x = 1; x < W-1; x++) {
-      const gx = gray[y*W+x+1] - gray[y*W+x-1];
-      const gy = gray[(y+1)*W+x] - gray[(y-1)*W+x];
-      let mag = Math.sqrt(gx*gx + gy*gy);
-      mag = mag > thresh ? Math.min(255, mag * glow) : 0;
-      const i4 = (y*W+x)*4;
-      d[i4]   = Math.min(255, mag * 0.85 + 20);
-      d[i4+1] = Math.min(255, mag * 0.82);
-      d[i4+2] = Math.min(255, mag * 0.72);
-    }
-  }
-  return id;
-}
-
-// KALEIDOSCOPE — fold into N-segment symmetry from center
-function fxKaleid(id) {
-  const W = id.width, H = id.height;
-  const src = new Uint8ClampedArray(id.data);
-  const d   = id.data;
-  const segs = Math.max(2, Math.floor(paramVals.kl_segs));
-  const rotSpd = paramVals.kl_rot * 0.002;
-  const rot = frameCount * rotSpd;
-  const cx = W/2, cy = H/2;
-  const segAngle = Math.PI * 2 / segs;
-
-  for (let y = 0; y < H; y++) {
-    for (let x = 0; x < W; x++) {
-      let dx = x - cx, dy = y - cy;
-      let angle = Math.atan2(dy, dx) + rot;
-      const r = Math.sqrt(dx*dx + dy*dy);
-      angle = ((angle % segAngle) + segAngle) % segAngle;
-      if (angle > segAngle/2) angle = segAngle - angle;
-      const sx = Math.round(cx + r * Math.cos(angle));
-      const sy = Math.round(cy + r * Math.sin(angle));
-      const i4 = (y*W+x)*4;
-      if (sx>=0 && sx<W && sy>=0 && sy<H) {
-        const s4 = (sy*W+sx)*4;
-        d[i4]=src[s4]; d[i4+1]=src[s4+1]; d[i4+2]=src[s4+2];
-      }
-    }
-  }
-  return id;
-}
-
-// CHROMA SPLIT — shift R, G, B channels in different directions
-function fxChroma(id) {
-  const W = id.width, H = id.height;
-  const src = new Uint8ClampedArray(id.data);
-  const d   = id.data;
-  const shift = Math.floor(paramVals.ch_shift);
-  const angle = paramVals.ch_angle * Math.PI / 180;
-  const dx = Math.round(Math.cos(angle) * shift);
-  const dy = Math.round(Math.sin(angle) * shift);
-
-  for (let y = 0; y < H; y++) {
-    for (let x = 0; x < W; x++) {
-      const i4 = (y*W+x)*4;
-      // Red: shifted forward
-      const rx = x+dx, ry = y+dy;
-      if (rx>=0&&rx<W&&ry>=0&&ry<H) d[i4] = src[(ry*W+rx)*4];
-      // Green: no shift
-      d[i4+1] = src[i4+1];
-      // Blue: shifted back
-      const bx = x-dx, by_ = y-dy;
-      if (bx>=0&&bx<W&&by_>=0&&by_<H) d[i4+2] = src[(by_*W+bx)*4+2];
-    }
-  }
-  return id;
-}
-
-// SCRIBBLE FIELD — vertical sine-wave line overlay derived from brightness
-function fxScribble(id) {
-  const W = id.width, H = id.height;
-  const d = id.data;
-  const dens  = paramVals.sc_dens;
-  const amp   = paramVals.sc_amp;
-  const speed = paramVals.sc_speed;
-  const t = frameCount * speed * 0.04;
-
-  // Draw vertical scribble lines derived from pixel brightness
-  for (let x = 0; x < W; x += Math.max(1, Math.round(W/60/dens*5))) {
-    for (let y = 0; y < H; y++) {
-      const i4 = (y*W+x)*4;
-      const bright = (d[i4]+d[i4+1]+d[i4+2])/3;
-      const wobble = Math.sin(y*0.05 + t + x*0.03) * amp * (bright/255);
-      const nx = Math.round(x + wobble);
-      if (nx>=0 && nx<W) {
-        const s4 = (y*W+nx)*4;
-        // boost the line pixel with a chromatic hue derived from column
-        const hue = (x/W * 360 + t*30) % 360;
-        const [hr,hg,hb] = hsl2rgb(hue, 0.7, 0.6);
-        d[i4]   = Math.min(255, d[i4]   * 0.5 + hr * 0.7);
-        d[i4+1] = Math.min(255, d[i4+1] * 0.5 + hg * 0.7);
-        d[i4+2] = Math.min(255, d[i4+2] * 0.5 + hb * 0.7);
-        d[s4]   = Math.min(255, d[s4]   * 0.3 + hr);
-        d[s4+1] = Math.min(255, d[s4+1] * 0.3 + hg);
-        d[s4+2] = Math.min(255, d[s4+2] * 0.3 + hb);
-      }
-    }
-  }
-  return id;
-}
-
-// COLOR FLOOD — extreme saturation + hue rotation + bleed
-function fxColorFlood(id) {
-  const W = id.width, H = id.height;
-  const d = id.data;
-  const sat   = paramVals.cf_sat / 100;
-  const hrot  = paramVals.cf_hrot;
-  const bleed = paramVals.cf_bleed;
-
-  // bleed pass — smear colors horizontally
-  if (bleed > 0) {
-    for (let y = 0; y < H; y++) {
-      let pr=0,pg=0,pb=0;
-      for (let x = 0; x < W; x++) {
-        const i4 = (y*W+x)*4;
-        pr = pr*0.9 + d[i4]*0.1;
-        pg = pg*0.9 + d[i4+1]*0.1;
-        pb = pb*0.9 + d[i4+2]*0.1;
-        d[i4]   = Math.min(255, d[i4]   * (1-bleed/100) + pr * (bleed/100) * 3);
-        d[i4+1] = Math.min(255, d[i4+1] * (1-bleed/100) + pg * (bleed/100) * 3);
-        d[i4+2] = Math.min(255, d[i4+2] * (1-bleed/100) + pb * (bleed/100) * 3);
-      }
-    }
-  }
-  // saturation + hue rotate
-  for (let i = 0; i < d.length; i += 4) {
-    let [h,s,l] = rgb2hsl(d[i],d[i+1],d[i+2]);
-    h = (h + hrot/360) % 1;
-    s = Math.min(1, s * sat);
-    const [r,g,b] = hsl2rgb(h*360, s, l);
-    d[i]=r; d[i+1]=g; d[i+2]=b;
-  }
-  return id;
-}
-
-// PIXEL SCRAMBLE — random pixel displacement in blocks
-function fxPixelScram(id) {
-  const W = id.width, H = id.height;
-  const src = new Uint8ClampedArray(id.data);
-  const d   = id.data;
-  const intensity = paramVals.ps_int / 100;
-  const blockSz   = Math.max(1, Math.floor(paramVals.ps_block));
-
-  // build / reuse map
-  if (!pixelMap || pixelMap.length !== W*H) {
-    pixelMap = buildScramMap(W, H, intensity, blockSz);
-  }
-  for (let i = 0; i < W*H; i++) {
-    const s = pixelMap[i] * 4, d4 = i*4;
-    d[d4]=src[s]; d[d4+1]=src[s+1]; d[d4+2]=src[s+2];
-  }
-  return id;
-}
-
-function buildScramMap(W, H, intensity, bsz) {
-  const total = W*H;
-  const map = new Int32Array(total);
-  for (let i=0;i<total;i++) map[i]=i;
-  const swaps = Math.floor(total * intensity * 0.5);
-  for (let i=0;i<swaps;i++) {
-    const a=Math.floor(Math.random()*total);
-    const b=Math.floor(Math.random()*total);
-    const t=map[a]; map[a]=map[b]; map[b]=t;
-  }
-  return map;
-}
-
-// DATAMOSH — blend current frame with decaying previous frame
-function fxDatamosh(id) {
-  const blend = paramVals.dm_blend / 100;
-  const glitch = paramVals.dm_glitch / 100;
-  const d = id.data;
-
-  if (!prevFrameData || prevFrameData.length !== d.length) {
-    prevFrameData = new Uint8ClampedArray(d);
-    return id;
-  }
-  for (let i = 0; i < d.length; i += 4) {
-    // occasional glitch — swap with random past pixel
-    if (Math.random() < glitch * 0.01) {
-      const off = Math.floor(Math.random() * (d.length/4)) * 4;
-      d[i]=prevFrameData[off]; d[i+1]=prevFrameData[off+1]; d[i+2]=prevFrameData[off+2];
-    } else {
-      d[i]   = d[i]   * (1-blend) + prevFrameData[i]   * blend;
-      d[i+1] = d[i+1] * (1-blend) + prevFrameData[i+1] * blend;
-      d[i+2] = d[i+2] * (1-blend) + prevFrameData[i+2] * blend;
-    }
-  }
-  // decay prev frame toward current
-  for (let i = 0; i < d.length; i += 4) {
-    prevFrameData[i]   = prevFrameData[i]   * 0.85 + d[i]   * 0.15;
-    prevFrameData[i+1] = prevFrameData[i+1] * 0.85 + d[i+1] * 0.15;
-    prevFrameData[i+2] = prevFrameData[i+2] * 0.85 + d[i+2] * 0.15;
-  }
-  return id;
-}
-
-// THERMAL — luminance → heat-map color
-function fxThermal(id) {
-  const d = id.data;
-  const shift = paramVals.th_shift;
-  const boost = paramVals.th_boost / 100;
-  for (let i = 0; i < d.length; i += 4) {
-    const lum = (d[i]*0.299 + d[i+1]*0.587 + d[i+2]*0.114) * boost;
-    const hue = ((1 - lum/255) * 240 + shift) % 360;
-    const [r,g,b] = hsl2rgb(hue, 1, Math.min(0.5, lum/255 * 0.6 + 0.05));
-    d[i]=r; d[i+1]=g; d[i+2]=b;
-  }
-  return id;
-}
-
-// ─── COLOR HELPERS ───────────────────────────────────────
-function hsl2rgb(h, s, l) {
-  h = ((h%360)+360)%360 / 360;
-  let r,g,b;
-  if (s===0) { r=g=b=l; }
-  else {
-    const q = l<0.5 ? l*(1+s) : l+s-l*s;
-    const p = 2*l-q;
-    r = hue2rgb(p,q,h+1/3);
-    g = hue2rgb(p,q,h);
-    b = hue2rgb(p,q,h-1/3);
-  }
-  return [Math.round(r*255), Math.round(g*255), Math.round(b*255)];
-}
-function hue2rgb(p,q,t) {
-  if(t<0)t+=1; if(t>1)t-=1;
-  if(t<1/6) return p+(q-p)*6*t;
-  if(t<1/2) return q;
-  if(t<2/3) return p+(q-p)*(2/3-t)*6;
-  return p;
-}
-function rgb2hsl(r,g,b) {
-  r/=255; g/=255; b/=255;
-  const max=Math.max(r,g,b), min=Math.min(r,g,b);
-  let h,s,l=(max+min)/2;
-  if(max===min){h=s=0;}
-  else{
-    const d=max-min;
-    s=l>0.5?d/(2-max-min):d/(max+min);
-    switch(max){
-      case r:h=(g-b)/d+(g<b?6:0);break;
-      case g:h=(b-r)/d+2;break;
-      default:h=(r-g)/d+4;
-    }
-    h/=6;
-  }
-  return [h,s,l];
-}
-
-// ─── EXPORT ──────────────────────────────────────────────
-async function exportVideo() {
-  if (!video.src) return;
-  const btn  = document.getElementById('expBtn');
-  const prog = document.getElementById('exprog');
-  const fill = document.getElementById('epfill');
-  const lbl  = document.getElementById('eplbl');
-
-  btn.disabled = true;
-  prog.classList.add('show');
-
-  const offCvs = document.createElement('canvas');
-  offCvs.width  = video.videoWidth;
-  offCvs.height = video.videoHeight;
-  const offCtx = offCvs.getContext('2d');
-
-  let stream, recorder;
-  try {
-    stream   = offCvs.captureStream(fpsReduceEnabled ? targetFps : 30);
-    recorder = new MediaRecorder(stream, { mimeType: 'video/webm; codecs=vp8' });
-  } catch(e) {
-    lbl.textContent = 'Recording not supported — use Chrome.';
-    btn.disabled = false;
-    return;
-  }
-
-  const chunks = [];
-  recorder.ondataavailable = e => { if(e.data.size>0) chunks.push(e.data); };
-  recorder.onstop = () => {
-    const blob = new Blob(chunks, { type:'video/webm' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    const base = videoFile ? videoFile.name.replace(/\.[^.]+$/,'') : 'video';
-    a.download = base + '_' + currentFx + '.webm';
+async function exportV(){
+  if(!vid.src)return;
+  const btn=document.getElementById('expBtn'),prog=document.getElementById('eprog');
+  const fill=document.getElementById('epf'),lbl=document.getElementById('epl');
+  btn.disabled=true;prog.classList.add('on');
+  const w=appliedCrop?appliedCrop.w:vid.videoWidth;
+  const h=appliedCrop?appliedCrop.h:vid.videoHeight;
+  const oc=document.createElement('canvas');oc.width=w;oc.height=h;
+  const ox=oc.getContext('2d');
+  const fps=appliedFps||vFps;
+  let stream,recorder;
+  try{stream=oc.captureStream(fps);recorder=new MediaRecorder(stream,{mimeType:'video/webm; codecs=vp8'});}
+  catch(e){lbl.textContent='Use Chrome for export.';btn.disabled=false;return;}
+  const chunks=[];
+  recorder.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data)};
+  recorder.onstop=()=>{
+    const blob=new Blob(chunks,{type:'video/webm'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=(vFile?vFile.name.replace(/\.[^.]+$/,''):'video')+'_edited.webm';
     a.click();
-    prog.classList.remove('show');
-    btn.disabled = false;
-    lbl.textContent = 'Done!';
-    setTimeout(() => lbl.textContent = 'Preparing…', 2000);
+    prog.classList.remove('on');btn.disabled=false;lbl.textContent='Done!';
+    setTimeout(()=>lbl.textContent='Preparing…',2500);
   };
-
-  // Reset state for export
-  prevFrameData = null; pixelMap = null; frameCount = 0;
-  video.currentTime = 0;
-  await new Promise(r => { video.onseeked = r; });
-  video.muted = true;
-  await video.play();
-  recorder.start();
-
-  const duration = video.duration;
-  const fpsInterval = fpsReduceEnabled ? 1000/targetFps : 0;
-  let lastExportFrame = 0;
-
-  function exportLoop(ts) {
-    if (video.ended || video.currentTime >= duration) {
-      video.pause();
-      setTimeout(() => recorder.stop(), 200);
-      return;
-    }
-    if (fpsReduceEnabled && ts - lastExportFrame < fpsInterval) {
-      requestAnimationFrame(exportLoop);
-      return;
-    }
-    lastExportFrame = ts;
-    frameCount++;
-    offCtx.drawImage(video, 0, 0, offCvs.width, offCvs.height);
-    let id = offCtx.getImageData(0, 0, offCvs.width, offCvs.height);
-    id = applyFx(id, currentFx);
-    offCtx.putImageData(id, 0, 0);
-    const pct = Math.round(video.currentTime / duration * 100);
-    fill.style.width = pct + '%';
-    lbl.textContent = 'Exporting… ' + pct + '%';
-    requestAnimationFrame(exportLoop);
+  vid.currentTime=0;await new Promise(r=>{vid.onseeked=r});
+  vid.muted=true;await vid.play();recorder.start();
+  const dur=vid.duration,interval=1000/fps;let lt=0;
+  function loop(ts){
+    if(vid.ended||vid.currentTime>=dur){vid.pause();setTimeout(()=>recorder.stop(),200);return;}
+    if(ts-lt<interval){requestAnimationFrame(loop);return;}
+    lt=ts;
+    if(appliedCrop)ox.drawImage(vid,appliedCrop.x,appliedCrop.y,appliedCrop.w,appliedCrop.h,0,0,w,h);
+    else ox.drawImage(vid,0,0,w,h);
+    fill.style.width=Math.round(vid.currentTime/dur*100)+'%';
+    lbl.textContent='Exporting… '+Math.round(vid.currentTime/dur*100)+'%';
+    requestAnimationFrame(loop);
   }
-  requestAnimationFrame(exportLoop);
+  requestAnimationFrame(loop);
 }
-
-// ─── INIT ────────────────────────────────────────────────
-renderParams('none');
 </script>
 </body>
 </html>
