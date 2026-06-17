@@ -9,14 +9,17 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#F6F6F4;--bg2:#EDEDEB;--surf:#fff;
-  --bdr:#E2E2DE;--bdr2:#C8C8C4;
-  --ink:#111;--ink2:#555;--ink3:#999;
-  --green:#1A9E5C;--r:10px;--rs:6px;
+  --bg:#080808;--bg2:rgba(255,255,255,0.06);--surf:rgba(14,14,14,0.88);
+  --bdr:rgba(255,255,255,0.10);--bdr2:rgba(255,255,255,0.18);
+  --ink:#F2F2F2;--ink2:#A8A8A8;--ink3:#666;
+  --green:#5CE0A0;--accent:#F2F2F2;--btn-fg:#080808;
+  --r:10px;--rs:6px;
 }
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);height:100vh;display:flex;flex-direction:column;overflow:hidden;position:relative}
+body::before{content:'';position:fixed;inset:0;background:url('assets/background.png') center/cover no-repeat fixed;z-index:-2}
+body::after{content:'';position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:-1}
 
-header{height:50px;padding:0 22px;display:flex;align-items:center;justify-content:space-between;background:var(--surf);border-bottom:1px solid var(--bdr);flex-shrink:0}
+header{height:50px;padding:0 22px;display:flex;align-items:center;justify-content:space-between;background:var(--surf);border-bottom:1px solid var(--bdr);flex-shrink:0;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .logo{display:flex;align-items:center}
 .logo-t{font-size:16px;font-weight:600;letter-spacing:-.04em;color:var(--ink)}
 .logo-ds{display:inline-flex;gap:3px;margin-left:2px;position:relative;top:1px}
@@ -31,19 +34,22 @@ header{height:50px;padding:0 22px;display:flex;align-items:center;justify-conten
 
 .main{flex:1;display:grid;grid-template-columns:1fr 310px;overflow:hidden;min-height:0}
 
-.pview{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:var(--bg);position:relative;overflow:hidden}
-.dz{width:100%;height:100%;border:1.5px dashed var(--bdr2);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer;background:var(--surf);transition:border-color .2s,background .2s}
+.pview{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:transparent;position:relative;overflow:hidden}
+.dz{width:100%;height:100%;border:1.5px dashed var(--bdr2);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer;background:var(--surf);transition:border-color .2s,background .2s;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .dz:hover,.dz.over{border-color:var(--ink3);background:var(--bg2)}
 .dzi{width:42px;height:42px;border-radius:50%;background:var(--bg2);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center}
 .dzi svg{width:17px;height:17px;stroke:var(--ink3);fill:none;stroke-width:1.5}
 .dzt{font-size:14px;font-weight:500}
 .dzs{font-size:11px;color:var(--ink3)}
-.dzb{padding:7px 16px;border-radius:var(--rs);background:var(--ink);border:none;color:#fff;font-size:11px;font-family:inherit;font-weight:500;cursor:pointer}
+.dzb{padding:7px 16px;border-radius:var(--rs);background:var(--accent);border:none;color:var(--btn-fg);font-size:11px;font-family:inherit;font-weight:500;cursor:pointer}
 .dzb:hover{opacity:.8}
 
 .stage{width:100%;height:100%;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px}
-.vo{position:relative;background:#000;border-radius:10px;overflow:hidden;box-shadow:0 4px 28px rgba(0,0,0,.14);transform-style:preserve-3d;transition:transform .25s}
-#pv{display:block;border-radius:10px}
+.vo{position:relative;background:#000;border-radius:10px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,0.08)}
+#pv{display:block;border-radius:10px;transition:opacity .2s}
+#pv.hidden-vid{opacity:0}
+#pcv{position:absolute;inset:0;width:100%;height:100%;border-radius:10px;display:none;image-rendering:pixelated;image-rendering:crisp-edges}
+#pcv.on{display:block}
 .cov{position:absolute;inset:0;display:none;cursor:crosshair;user-select:none}
 .cov.on{display:block}
 .csel{position:absolute;border:1.5px solid #fff;box-shadow:0 0 0 9999px rgba(0,0,0,.45);display:none;pointer-events:none}
@@ -56,21 +62,21 @@ header{height:50px;padding:0 22px;display:flex;align-items:center;justify-conten
 .vf{height:100%;background:var(--ink);border-radius:2px;width:0%}
 .vtm{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);flex-shrink:0;min-width:72px;text-align:right}
 
-.proc{position:absolute;inset:0;background:rgba(246,246,244,.88);display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;border-radius:14px;z-index:30}
+.proc{position:absolute;inset:0;background:rgba(8,8,8,.82);display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;border-radius:14px;z-index:30;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .proc.on{display:flex}
 .pds{display:flex;gap:5px}
 .pd{width:6px;height:6px;border-radius:50%;background:var(--ink);animation:bl 1s ease-in-out infinite}
 .pd:nth-child(2){animation-delay:.15s}.pd:nth-child(3){animation-delay:.3s}
 .plb{font-size:11px;color:var(--ink2)}
 
-.panel{background:var(--surf);border-left:1px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden}
+.panel{background:var(--surf);border-left:1px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .tools{flex:1;overflow-y:auto}
 .tools::-webkit-scrollbar{width:0}
 .tool{border-bottom:1px solid var(--bdr)}
 .th{padding:13px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;transition:background .15s}
-.th:hover{background:var(--bg)}
+.th:hover{background:var(--bg2)}
 .thl{display:flex;align-items:center;gap:9px}
-.ti{width:26px;height:26px;border-radius:6px;background:var(--bg);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ti{width:26px;height:26px;border-radius:6px;background:var(--bg2);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .ti svg{width:12px;height:12px;stroke:var(--ink2);fill:none;stroke-width:1.8}
 .tn{font-size:12px;font-weight:500}
 .tst{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);margin-top:1px}
@@ -91,32 +97,28 @@ input[type=range]:disabled{opacity:.3;cursor:not-allowed}
 .badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:4px;background:var(--bg2);border:1px solid var(--bdr);font-size:10px;font-family:'DM Mono',monospace;color:var(--ink2);margin-bottom:10px}
 .badge b{color:var(--ink);font-weight:500}
 
-.abtn{width:100%;padding:9px;border-radius:var(--rs);background:var(--ink);color:#fff;border:none;font-size:11px;font-family:inherit;font-weight:600;cursor:pointer;transition:opacity .15s,background .25s;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:5px}
+.abtn{width:100%;padding:9px;border-radius:var(--rs);background:var(--accent);color:var(--btn-fg);border:none;font-size:11px;font-family:inherit;font-weight:600;cursor:pointer;transition:opacity .15s,background .25s;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:5px}
 .abtn:hover{opacity:.85}
 .abtn:disabled{opacity:.3;cursor:not-allowed}
 .abtn.ok{background:var(--green)}
-.abtn svg{width:11px;height:11px;stroke:#fff;fill:none;stroke-width:2.5}
+.abtn svg{width:11px;height:11px;stroke:var(--btn-fg);fill:none;stroke-width:2.5}
 
 .cbtns{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
 .cb{padding:7px;border-radius:var(--rs);font-size:11px;font-family:inherit;font-weight:500;cursor:pointer;border:1px solid var(--bdr);background:var(--surf);color:var(--ink2);display:flex;align-items:center;justify-content:center;gap:4px;transition:background .15s}
 .cb:hover{background:var(--bg2)}
-.cb.full{grid-column:1/-1;background:var(--ink);color:#fff;border-color:var(--ink)}
+.cb.full{grid-column:1/-1;background:var(--accent);color:var(--btn-fg);border-color:var(--accent)}
 .cb.full:hover{opacity:.85}
 .cb.full:disabled{opacity:.3;cursor:not-allowed}
 .cb svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2}
 .cinf{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);margin-top:8px;min-height:14px}
 
-.axrow{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.axl{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);width:16px;flex-shrink:0}
-.axc{flex:1}
-.ax2{display:flex;gap:6px;margin-top:4px}
-.ax2b{flex:1;padding:7px;border-radius:var(--rs);font-size:11px;font-family:inherit;font-weight:500;cursor:pointer;border:1px solid var(--bdr);background:var(--bg);color:var(--ink2);transition:background .15s;text-align:center}
-.ax2b:hover{background:var(--bg2)}
+.sel{width:100%;padding:7px 9px;border-radius:var(--rs);border:1px solid var(--bdr);background:var(--surf);font-size:11px;font-family:inherit;color:var(--ink);cursor:pointer;outline:none}
+.sel:focus{border-color:var(--ink3)}
 
 .note{font-size:10px;color:var(--ink3);line-height:1.6;margin-top:6px}
 
 .exps{padding:14px 16px;border-top:1px solid var(--bdr);flex-shrink:0}
-.expbtn{width:100%;padding:10px;border-radius:var(--rs);background:var(--ink);color:#fff;border:none;font-size:12px;font-family:inherit;font-weight:600;cursor:pointer;transition:opacity .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.expbtn{width:100%;padding:10px;border-radius:var(--rs);background:var(--accent);color:var(--btn-fg);border:none;font-size:12px;font-family:inherit;font-weight:600;cursor:pointer;transition:opacity .15s;display:flex;align-items:center;justify-content:center;gap:6px}
 .expbtn:disabled{opacity:.3;cursor:not-allowed}
 .expbtn:not(:disabled):hover{opacity:.85}
 .expbtn svg{width:13px;height:13px}
@@ -125,6 +127,12 @@ input[type=range]:disabled{opacity:.3;cursor:not-allowed}
 .epbar{height:2px;background:var(--bg2);border-radius:2px;overflow:hidden;margin-bottom:5px}
 .epf{height:100%;background:var(--ink);border-radius:2px;width:0%}
 .epl{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);text-align:center}
+
+.rbtn{padding:7px;border-radius:var(--rs);font-size:11px;font-family:inherit;font-weight:500;cursor:pointer;border:1px solid var(--bdr);background:var(--bg2);color:var(--ink2);transition:background .15s;text-align:center;width:100%;margin-top:8px}
+.rbtn:hover{background:var(--bdr)}
+.btnrow{display:flex;gap:6px;margin-top:12px}
+.btnrow .abtn{margin-top:0;flex:2}
+.btnrow .rbtn{margin-top:0;flex:1;width:auto}
 </style>
 </head>
 <body>
@@ -159,6 +167,7 @@ input[type=range]:disabled{opacity:.3;cursor:not-allowed}
     <div class="stage" id="stage">
       <div class="vo" id="vo">
         <video id="pv" playsinline></video>
+        <canvas id="pcv"></canvas>
         <div class="cov" id="cov">
           <div class="csel" id="csel"></div>
         </div>
@@ -194,7 +203,7 @@ input[type=range]:disabled{opacity:.3;cursor:not-allowed}
             <div class="sh"><span class="sl">Target frame rate</span><span class="sv" id="fpsV">—</span></div>
             <input type="range" id="fpsR" min="1" max="29" value="12" disabled oninput="onFps()">
           </div>
-          <p class="note">Capped 1 below source FPS. Lower = choppier, stop-motion feel.</p>
+          <p class="note">Export frame rate — capped 1 below source. Lower = choppier, stop-motion feel.</p>
           <button class="abtn" id="apFps" disabled onclick="doFps()">
             <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
             Apply &amp; preview
@@ -230,50 +239,64 @@ input[type=range]:disabled{opacity:.3;cursor:not-allowed}
         </div>
       </div>
 
-      <div class="tool" id="t3d">
-        <div class="th" onclick="tog('t3d')">
+      <div class="tool" id="t8bit">
+        <div class="th" onclick="tog('t8bit')">
           <div class="thl">
-            <div class="ti"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
-            <div><p class="tn">3D Alignment</p><p class="tst" id="tdS">X · Y · Z + perspective</p></div>
+            <div class="ti"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><rect x="14" y="14" width="6" height="6"/></svg></div>
+            <div><p class="tn">8-Bit Style</p><p class="tst" id="bit8S">Pixelated retro look</p></div>
           </div>
           <svg class="chv" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
         <div class="tb">
-          <div class="axrow">
-            <span class="axl">X</span>
-            <div class="axc">
-              <div class="sh"><span class="sl">Tilt (up / down)</span><span class="sv" id="rxV">0°</span></div>
-              <input type="range" id="rxR" min="-50" max="50" value="0" oninput="on3d()">
-            </div>
+          <div class="sr">
+            <div class="sh"><span class="sl">Pixel size</span><span class="sv" id="bit8PxV">8px</span></div>
+            <input type="range" id="bit8PxR" min="4" max="32" value="8" oninput="onBit8()">
           </div>
-          <div class="axrow">
-            <span class="axl">Y</span>
-            <div class="axc">
-              <div class="sh"><span class="sl">Pan (left / right)</span><span class="sv" id="ryV">0°</span></div>
-              <input type="range" id="ryR" min="-50" max="50" value="0" oninput="on3d()">
-            </div>
+          <div class="sr">
+            <div class="sh"><span class="sl">Color levels</span><span class="sv" id="bit8ColV">8</span></div>
+            <input type="range" id="bit8ColR" min="2" max="16" value="8" oninput="onBit8()">
           </div>
-          <div class="axrow">
-            <span class="axl">Z</span>
-            <div class="axc">
-              <div class="sh"><span class="sl">Roll (clockwise)</span><span class="sv" id="rzV">0°</span></div>
-              <input type="range" id="rzR" min="-45" max="45" value="0" oninput="on3d()">
-            </div>
-          </div>
-          <div class="axrow" style="margin-bottom:0">
-            <span class="axl" style="font-size:9px;line-height:1.2">FOV</span>
-            <div class="axc">
-              <div class="sh"><span class="sl">Perspective depth</span><span class="sv" id="pvV">600px</span></div>
-              <input type="range" id="pvR" min="100" max="1400" value="600" oninput="on3d()">
-            </div>
-          </div>
-          <div class="ax2">
-            <button class="ax2b" onclick="reset3d()">Reset</button>
-            <button class="abtn" style="margin-top:0;flex:2" onclick="doApply3d()">
+          <p class="note">Chunky pixels + reduced palette. Applies to preview, export, and frame ZIP.</p>
+          <div class="btnrow">
+            <button class="rbtn" onclick="reset8bit()">Reset</button>
+            <button class="abtn" id="ap8bit" disabled onclick="doApply8bit()">
               <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
               Apply &amp; preview
             </button>
           </div>
+        </div>
+      </div>
+
+      <div class="tool" id="tFrames">
+        <div class="th" onclick="tog('tFrames')">
+          <div class="thl">
+            <div class="ti"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
+            <div><p class="tn">Frame Generator</p><p class="tst" id="frameS">Extract frames as images</p></div>
+          </div>
+          <svg class="chv" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="tb">
+          <div class="sr">
+            <div class="sh"><span class="sl">Image format</span></div>
+            <select class="sel" id="frameFmt" onchange="onFrameFmt()">
+              <option value="png">PNG (lossless)</option>
+              <option value="jpeg">JPEG (smaller)</option>
+              <option value="webp">WebP (modern)</option>
+            </select>
+          </div>
+          <div class="sr" id="frameQWrap" style="display:none">
+            <div class="sh"><span class="sl">Quality</span><span class="sv" id="frameQV">92%</span></div>
+            <input type="range" id="frameQ" min="0.5" max="1" step="0.05" value="0.92" oninput="onFrameQ()">
+          </div>
+          <div class="sr">
+            <div class="sh"><span class="sl">Extract every</span><span class="sv" id="frameStepV">1 frame</span></div>
+            <input type="range" id="frameStep" min="1" max="10" value="1" oninput="onFrameStep()">
+          </div>
+          <p class="note" id="frameEst">Load a video to see frame count.</p>
+          <button class="abtn" id="frameBtn" disabled onclick="exportFrames()">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Generate &amp; download ZIP
+          </button>
         </div>
       </div>
 
@@ -293,15 +316,21 @@ input[type=range]:disabled{opacity:.3;cursor:not-allowed}
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 const vid=document.getElementById('pv');
 const vo=document.getElementById('vo');
+const pcv=document.getElementById('pcv');
 const cov=document.getElementById('cov');
 const csel=document.getElementById('csel');
-let vFile=null,vFps=30,tgtFps=15;
+let vFile=null,vUrl=null,vFps=30,tgtFps=15;
 let cropRect=null,cropPx=null,appliedCrop=null,appliedFps=null;
 let isCropping=false,cropStart=null;
-let tilt={rx:0,ry:0,rz:0,p:600};
+let bit8Settings={pixelSize:8,colorLevels:8};
+let applied8bit=null;
+let bit8Offscreen=null;
+let previewLoopId=null;
+let previewUseRVFC=false;
 
 function tog(id){
   const el=document.getElementById(id),was=el.classList.contains('open');
@@ -318,16 +347,19 @@ fi.addEventListener('change',()=>{if(fi.files[0])loadV(fi.files[0])});
 dz.addEventListener('click',e=>{if(e.target===dz)fi.click()});
 
 function loadV(file){
+  if(vUrl)URL.revokeObjectURL(vUrl);
   vFile=file;appliedCrop=null;appliedFps=null;cropRect=null;cropPx=null;
-  resetCropUI();reset3dUI();
-  vid.src=URL.createObjectURL(file);
+  resetCropUI();reset8bit();
+  vUrl=URL.createObjectURL(file);
+  vid.src=vUrl;
   vid.onloadedmetadata=()=>{
     dz.style.display='none';
     document.getElementById('stage').style.display='flex';
     document.getElementById('chgBtn').classList.remove('h');
-    document.getElementById('expBtn').disabled=false;
+    setExportBusy(false);
+    document.getElementById('ap8bit').disabled=false;
     document.getElementById('cropS').textContent=vid.videoWidth+'×'+vid.videoHeight;
-    sizeVO();detectFps();
+    sizeVO();detectFps();updateFrameEst();
   };
   vid.ontimeupdate=()=>{
     document.getElementById('vf').style.width=(vid.currentTime/vid.duration*100)+'%';
@@ -343,6 +375,7 @@ function sizeVO(){
   let w=mw,h=mw/r;if(h>mh){h=mh;w=h*r;}
   vo.style.width=w+'px';vo.style.height=h+'px';
   vid.style.width=w+'px';vid.style.height=h+'px';
+  if(applied8bit)renderPreview();
 }
 window.addEventListener('resize',()=>{if(vid.videoWidth)sizeVO()});
 function fmt(s){s=isNaN(s)||!isFinite(s)?0:s;return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0')}
@@ -375,6 +408,7 @@ function setFpsUI(){
   document.getElementById('fpsV').textContent=tgtFps+' fps';
   document.getElementById('fpsS').textContent='Source: '+vFps+' fps';
   document.getElementById('apFps').disabled=false;
+  updateFrameEst();
 }
 
 function onFps(){
@@ -386,6 +420,7 @@ function onFps(){
 function doFps(){
   appliedFps=tgtFps;
   document.getElementById('fpsS').textContent=vFps+' → '+tgtFps+' fps';
+  updateFrameEst();
   flash('apFps','Frame rate applied');
   showProc('Updating frame rate…',600);
 }
@@ -442,6 +477,8 @@ function doApplyCrop(){
   document.getElementById('apCrop').disabled=true;
   document.getElementById('cropS').textContent=appliedCrop.w+'×'+appliedCrop.h+' px';
   document.getElementById('cinf').textContent='Preview showing cropped region';
+  updateFrameEst();
+  if(applied8bit)renderPreview();
   showProc('Applying crop…',600);
 }
 
@@ -449,6 +486,8 @@ function resetCrop(){
   appliedCrop=null;cropRect=null;cropPx=null;resetCropUI();sizeVO();
   Object.assign(vid.style,{position:'',left:'',top:''});
   document.getElementById('cropS').textContent=vid.videoWidth+'×'+vid.videoHeight;
+  updateFrameEst();
+  if(applied8bit)renderPreview();
 }
 function resetCropUI(){
   isCropping=false;cropStart=null;csel.style.display='none';cov.classList.remove('on');
@@ -458,35 +497,152 @@ function resetCropUI(){
   document.getElementById('cinf').textContent='';
 }
 
-function on3d(){
-  tilt.rx=+document.getElementById('rxR').value;
-  tilt.ry=+document.getElementById('ryR').value;
-  tilt.rz=+document.getElementById('rzR').value;
-  tilt.p= +document.getElementById('pvR').value;
-  document.getElementById('rxV').textContent=tilt.rx+'°';
-  document.getElementById('ryV').textContent=tilt.ry+'°';
-  document.getElementById('rzV').textContent=tilt.rz+'°';
-  document.getElementById('pvV').textContent=tilt.p+'px';
-  document.getElementById('pview').style.perspective=tilt.p+'px';
-  vo.style.transform=`rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) rotateZ(${tilt.rz}deg)`;
+function getExportDimensions(){
+  return{
+    w:appliedCrop?appliedCrop.w:vid.videoWidth,
+    h:appliedCrop?appliedCrop.h:vid.videoHeight,
+    fps:appliedFps||vFps
+  };
 }
-function doApply3d(){
-  document.getElementById('tdS').textContent=`X:${tilt.rx}° Y:${tilt.ry}° Z:${tilt.rz}°`;
-  showProc('Applying 3D transform…',500);
+function getBit8Offscreen(sw,sh){
+  if(!bit8Offscreen||bit8Offscreen.w!==sw||bit8Offscreen.h!==sh){
+    const c=document.createElement('canvas');
+    c.width=sw;c.height=sh;
+    bit8Offscreen={canvas:c,ctx:c.getContext('2d'),w:sw,h:sh};
+  }
+  return bit8Offscreen;
 }
-function reset3d(){
-  ['rxR','ryR','rzR'].forEach(id=>document.getElementById(id).value=0);
-  document.getElementById('pvR').value=600;
-  tilt={rx:0,ry:0,rz:0,p:600};
-  document.getElementById('rxV').textContent='0°';
-  document.getElementById('ryV').textContent='0°';
-  document.getElementById('rzV').textContent='0°';
-  document.getElementById('pvV').textContent='600px';
-  document.getElementById('tdS').textContent='X · Y · Z + perspective';
-  document.getElementById('pview').style.perspective='';
-  vo.style.transform='';
+function apply8BitEffect(ctx,w,h,settings){
+  const{pixelSize,colorLevels}=settings;
+  const sw=Math.max(1,Math.floor(w/pixelSize));
+  const sh=Math.max(1,Math.floor(h/pixelSize));
+  const off=getBit8Offscreen(sw,sh);
+  off.ctx.imageSmoothingEnabled=false;
+  off.ctx.drawImage(ctx.canvas,0,0,w,h,0,0,sw,sh);
+  ctx.imageSmoothingEnabled=false;
+  ctx.clearRect(0,0,w,h);
+  ctx.drawImage(off.canvas,0,0,sw,sh,0,0,w,h);
+  const step=255/(colorLevels-1);
+  const img=ctx.getImageData(0,0,w,h);
+  const d=img.data;
+  for(let i=0;i<d.length;i+=4){
+    d[i]=Math.round(d[i]/step)*step;
+    d[i+1]=Math.round(d[i+1]/step)*step;
+    d[i+2]=Math.round(d[i+2]/step)*step;
+  }
+  ctx.putImageData(img,0,0);
+  ctx.imageSmoothingEnabled=true;
 }
-function reset3dUI(){reset3d();}
+function drawVideoFrame(ctx,w,h){
+  if(appliedCrop)ctx.drawImage(vid,appliedCrop.x,appliedCrop.y,appliedCrop.w,appliedCrop.h,0,0,w,h);
+  else ctx.drawImage(vid,0,0,w,h);
+  if(applied8bit)apply8BitEffect(ctx,w,h,applied8bit);
+}
+function renderPreview(){
+  if(!applied8bit||!vid.src)return;
+  const{w,h}=getExportDimensions();
+  pcv.width=w;pcv.height=h;
+  pcv.style.width=vo.clientWidth+'px';
+  pcv.style.height=vo.clientHeight+'px';
+  drawVideoFrame(pcv.getContext('2d'),w,h);
+}
+function stopPreviewLoop(){
+  if(previewLoopId!==null){
+    if(previewUseRVFC&&vid.cancelVideoFrameCallback)vid.cancelVideoFrameCallback(previewLoopId);
+    else cancelAnimationFrame(previewLoopId);
+    previewLoopId=null;
+  }
+  vid.removeEventListener('timeupdate',renderPreview);
+  vid.classList.remove('hidden-vid');
+  pcv.classList.remove('on');
+}
+function startPreviewLoop(){
+  stopPreviewLoop();
+  if(!applied8bit||!vid.src)return;
+  vid.classList.add('hidden-vid');
+  pcv.classList.add('on');
+  renderPreview();
+  if(vid.requestVideoFrameCallback){
+    previewUseRVFC=true;
+    function frame(){renderPreview();if(applied8bit&&vid.src)previewLoopId=vid.requestVideoFrameCallback(frame);}
+    previewLoopId=vid.requestVideoFrameCallback(frame);
+  }else{
+    previewUseRVFC=false;
+    vid.addEventListener('timeupdate',renderPreview);
+    function loop(){renderPreview();if(applied8bit&&vid.src)previewLoopId=requestAnimationFrame(loop);}
+    previewLoopId=requestAnimationFrame(loop);
+  }
+}
+function onBit8(){
+  bit8Settings.pixelSize=+document.getElementById('bit8PxR').value;
+  bit8Settings.colorLevels=+document.getElementById('bit8ColR').value;
+  document.getElementById('bit8PxV').textContent=bit8Settings.pixelSize+'px';
+  document.getElementById('bit8ColV').textContent=bit8Settings.colorLevels;
+}
+function doApply8bit(){
+  applied8bit={...bit8Settings};
+  document.getElementById('bit8S').textContent=applied8bit.pixelSize+'px · '+applied8bit.colorLevels+' colors';
+  startPreviewLoop();
+  flash('ap8bit','8-bit effect applied');
+  showProc('Applying 8-bit effect…',600);
+}
+function reset8bit(){
+  applied8bit=null;
+  bit8Settings={pixelSize:8,colorLevels:8};
+  document.getElementById('bit8PxR').value=8;
+  document.getElementById('bit8ColR').value=8;
+  document.getElementById('bit8PxV').textContent='8px';
+  document.getElementById('bit8ColV').textContent='8';
+  document.getElementById('bit8S').textContent='Pixelated retro look';
+  stopPreviewLoop();
+}
+function seekVideo(t){
+  return new Promise(r=>{
+    const target=Math.max(0,Math.min(t,vid.duration-0.001));
+    if(Math.abs(vid.currentTime-target)<0.001){r();return;}
+    vid.onseeked=()=>r();
+    vid.currentTime=target;
+  });
+}
+function setExportBusy(busy){
+  document.getElementById('expBtn').disabled=busy||!vid.src;
+  document.getElementById('frameBtn').disabled=busy||!vid.src;
+}
+function getFrameCount(){
+  if(!vid.duration)return 0;
+  const{fps}=getExportDimensions();
+  const step=+document.getElementById('frameStep').value||1;
+  const total=Math.floor(vid.duration*fps);
+  return Math.ceil(total/step);
+}
+function updateFrameEst(){
+  const el=document.getElementById('frameEst');
+  if(!vid.duration){el.textContent='Load a video to see frame count.';return;}
+  const n=getFrameCount();
+  const fmt=document.getElementById('frameFmt').value.toUpperCase();
+  el.textContent='~'+n.toLocaleString()+' frames · '+fmt;
+  if(n>1500)el.textContent+=' · large export, may take a while';
+}
+function onFrameFmt(){
+  const fmt=document.getElementById('frameFmt').value;
+  document.getElementById('frameQWrap').style.display=fmt==='png'?'none':'block';
+  updateFrameEst();
+}
+function onFrameQ(){
+  document.getElementById('frameQV').textContent=Math.round(+document.getElementById('frameQ').value*100)+'%';
+}
+function onFrameStep(){
+  const step=+document.getElementById('frameStep').value;
+  document.getElementById('frameStepV').textContent=step===1?'1 frame':step+' frames';
+  updateFrameEst();
+}
+function downloadBlob(blob,name){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=name;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
 
 function showProc(msg,ms){
   const el=document.getElementById('proc');
@@ -501,42 +657,86 @@ function flash(id,msg){
 
 async function exportV(){
   if(!vid.src)return;
-  const btn=document.getElementById('expBtn'),prog=document.getElementById('eprog');
+  const prog=document.getElementById('eprog');
   const fill=document.getElementById('epf'),lbl=document.getElementById('epl');
-  btn.disabled=true;prog.classList.add('on');
-  const w=appliedCrop?appliedCrop.w:vid.videoWidth;
-  const h=appliedCrop?appliedCrop.h:vid.videoHeight;
+  const had8bit=!!applied8bit;
+  if(had8bit)stopPreviewLoop();
+  setExportBusy(true);prog.classList.add('on');
+  const{w,h,fps}=getExportDimensions();
   const oc=document.createElement('canvas');oc.width=w;oc.height=h;
   const ox=oc.getContext('2d');
-  const fps=appliedFps||vFps;
   let stream,recorder;
-  try{stream=oc.captureStream(fps);recorder=new MediaRecorder(stream,{mimeType:'video/webm; codecs=vp8'});}
-  catch(e){lbl.textContent='Use Chrome for export.';btn.disabled=false;return;}
+  const mimeTypes=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'];
+  let mime='video/webm';
+  for(const m of mimeTypes){if(MediaRecorder.isTypeSupported(m)){mime=m;break;}}
+  try{stream=oc.captureStream(fps);recorder=new MediaRecorder(stream,{mimeType:mime});}
+  catch(e){lbl.textContent='Use Chrome for export.';setExportBusy(false);if(had8bit)startPreviewLoop();return;}
   const chunks=[];
   recorder.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data)};
   recorder.onstop=()=>{
-    const blob=new Blob(chunks,{type:'video/webm'});
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
-    a.download=(vFile?vFile.name.replace(/\.[^.]+$/,''):'video')+'_edited.webm';
-    a.click();
-    prog.classList.remove('on');btn.disabled=false;lbl.textContent='Done!';
+    downloadBlob(new Blob(chunks,{type:'video/webm'}),(vFile?vFile.name.replace(/\.[^.]+$/,''):'video')+'_edited.webm');
+    prog.classList.remove('on');setExportBusy(false);
+    lbl.textContent='Done!';
+    if(had8bit)startPreviewLoop();
     setTimeout(()=>lbl.textContent='Preparing…',2500);
   };
-  vid.currentTime=0;await new Promise(r=>{vid.onseeked=r});
+  vid.currentTime=0;await seekVideo(0);
   vid.muted=true;await vid.play();recorder.start();
   const dur=vid.duration,interval=1000/fps;let lt=0;
   function loop(ts){
     if(vid.ended||vid.currentTime>=dur){vid.pause();setTimeout(()=>recorder.stop(),200);return;}
     if(ts-lt<interval){requestAnimationFrame(loop);return;}
     lt=ts;
-    if(appliedCrop)ox.drawImage(vid,appliedCrop.x,appliedCrop.y,appliedCrop.w,appliedCrop.h,0,0,w,h);
-    else ox.drawImage(vid,0,0,w,h);
+    drawVideoFrame(ox,w,h);
     fill.style.width=Math.round(vid.currentTime/dur*100)+'%';
     lbl.textContent='Exporting… '+Math.round(vid.currentTime/dur*100)+'%';
     requestAnimationFrame(loop);
   }
   requestAnimationFrame(loop);
+}
+
+async function exportFrames(){
+  if(!vid.src||typeof JSZip==='undefined')return;
+  const prog=document.getElementById('eprog');
+  const fill=document.getElementById('epf'),lbl=document.getElementById('epl');
+  const had8bit=!!applied8bit;
+  if(had8bit)stopPreviewLoop();
+  setExportBusy(true);prog.classList.add('on');
+  const format=document.getElementById('frameFmt').value;
+  const quality=+document.getElementById('frameQ').value;
+  const step=+document.getElementById('frameStep').value||1;
+  const{w,h,fps}=getExportDimensions();
+  const mime=format==='png'?'image/png':format==='jpeg'?'image/jpeg':'image/webp';
+  const ext=format==='jpeg'?'jpg':format;
+  const oc=document.createElement('canvas');oc.width=w;oc.height=h;
+  const ox=oc.getContext('2d');
+  const zip=new JSZip();
+  const totalFrames=Math.floor(vid.duration*fps);
+  const wasMuted=vid.muted,wasPaused=vid.paused,savedTime=vid.currentTime;
+  vid.muted=true;vid.pause();
+  let frameIndex=0;
+  for(let i=0;i<totalFrames;i+=step){
+    await seekVideo(i/fps);
+    drawVideoFrame(ox,w,h);
+    const blob=await new Promise(res=>oc.toBlob(res,mime,quality));
+    if(!blob){lbl.textContent='Format not supported in this browser.';prog.classList.remove('on');setExportBusy(false);vid.currentTime=savedTime;vid.muted=wasMuted;if(!wasPaused)vid.play();if(had8bit)startPreviewLoop();return;}
+    zip.file('frame_'+String(frameIndex).padStart(5,'0')+'.'+ext,blob);
+    frameIndex++;
+    fill.style.width=Math.round(frameIndex/getFrameCount()*100)+'%';
+    lbl.textContent='Extracting… '+Math.round(frameIndex/getFrameCount()*100)+'%';
+  }
+  lbl.textContent='Zipping…';
+  fill.style.width='100%';
+  const zipBlob=await zip.generateAsync({type:'blob'},meta=>{
+    fill.style.width=Math.round(meta.percent)+'%';
+    lbl.textContent='Zipping… '+Math.round(meta.percent)+'%';
+  });
+  downloadBlob(zipBlob,(vFile?vFile.name.replace(/\.[^.]+$/,''):'video')+'_frames.zip');
+  vid.currentTime=savedTime;vid.muted=wasMuted;if(!wasPaused)vid.play();
+  prog.classList.remove('on');setExportBusy(false);
+  if(had8bit)startPreviewLoop();
+  lbl.textContent='Done!';
+  setTimeout(()=>{lbl.textContent='Preparing…';fill.style.width='0%';},2500);
 }
 </script>
 </body>
