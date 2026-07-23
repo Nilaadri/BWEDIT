@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Dot..</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -15,11 +15,11 @@
   --green:#5CE0A0;--accent:#F2F2F2;--btn-fg:#080808;
   --r:10px;--rs:6px;
 }
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);height:100vh;display:flex;flex-direction:column;overflow:hidden;position:relative}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden;position:relative;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
 body::before{content:'';position:fixed;inset:0;background:url('assets/background.png') center/cover no-repeat fixed;z-index:-2}
 body::after{content:'';position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:-1}
 
-header{height:50px;padding:0 22px;display:flex;align-items:center;justify-content:space-between;background:var(--surf);border-bottom:1px solid var(--bdr);flex-shrink:0;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+header{height:calc(50px + env(safe-area-inset-top));padding:env(safe-area-inset-top) 22px 0;display:flex;align-items:center;justify-content:space-between;background:var(--surf);border-bottom:1px solid var(--bdr);flex-shrink:0;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .logo{display:flex;align-items:center}
 .logo-t{font-size:16px;font-weight:600;letter-spacing:-.04em;color:var(--ink)}
 .logo-ds{display:inline-flex;gap:3px;margin-left:2px;position:relative;top:1px}
@@ -50,7 +50,7 @@ header{height:50px;padding:0 22px;display:flex;align-items:center;justify-conten
 #pv.hidden-vid{opacity:0}
 #pcv{position:absolute;inset:0;width:100%;height:100%;border-radius:10px;display:none;image-rendering:pixelated;image-rendering:crisp-edges}
 #pcv.on{display:block}
-.cov{position:absolute;inset:0;display:none;cursor:crosshair;user-select:none}
+.cov{position:absolute;inset:0;display:none;cursor:crosshair;user-select:none;touch-action:none}
 .cov.on{display:block}
 .csel{position:absolute;border:1.5px solid #fff;box-shadow:0 0 0 9999px rgba(0,0,0,.45);display:none;pointer-events:none}
 
@@ -58,7 +58,7 @@ header{height:50px;padding:0 22px;display:flex;align-items:center;justify-conten
 .vbtn{width:30px;height:30px;border-radius:50%;background:var(--surf);border:1px solid var(--bdr);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
 .vbtn:hover{background:var(--bg2)}
 .vbtn svg{width:13px;height:13px;fill:var(--ink)}
-.vp{flex:1;height:3px;background:var(--bdr);border-radius:2px;cursor:pointer}
+.vp{flex:1;height:3px;background:var(--bdr);border-radius:2px;cursor:pointer;touch-action:none}
 .vf{height:100%;background:var(--ink);border-radius:2px;width:0%;transition:width .1s linear}
 .vtm{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);flex-shrink:0;min-width:72px;text-align:right}
 
@@ -139,6 +139,45 @@ input[type=range]:disabled{opacity:.3;cursor:not-allowed}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
+
+/* Tablet & phone: stack video preview above the tools panel instead of
+   a fixed 310px side column, which gets cramped below ~860px wide. */
+@media (max-width:860px){
+  .main{grid-template-columns:1fr;grid-template-rows:minmax(200px,42vh) 1fr;overflow-y:visible}
+  .pview{padding:14px 14px 10px}
+  .panel{border-left:none;border-top:1px solid var(--bdr)}
+  .dz{border-radius:12px}
+}
+@media (max-width:480px){
+  header{padding-left:14px;padding-right:14px}
+  .logo-t{font-size:15px}
+  .chg{height:30px;padding:0 10px}
+  .pview{padding:10px 10px 8px}
+  .dzi{width:38px;height:38px}
+  .dzt{font-size:13px}
+  .th{padding:14px}
+  .tb{padding-left:14px;padding-right:14px}
+  .tool.open .tb{padding-left:14px;padding-right:14px}
+  .exps{padding:12px 14px}
+}
+.exps{padding-bottom:calc(14px + env(safe-area-inset-bottom))}
+
+/* Touch devices (phones, tablets, and touch laptops): bigger hit targets
+   and no 300ms tap delay / double-tap zoom on interactive controls. */
+@media (hover:none) and (pointer:coarse){
+  .vbtn{width:38px;height:38px}
+  .vbtn svg{width:16px;height:16px}
+  .vp{height:6px;touch-action:none}
+  input[type=range]{height:5px}
+  input[type=range]::-webkit-slider-thumb{width:19px;height:19px}
+  .th{padding:15px 16px;min-height:44px}
+  .chg,.dzb,.cb,.abtn,.expbtn,.rbtn,.vbtn{min-height:40px}
+  button,.chg,.dzb,.cb,.abtn,.expbtn,.rbtn,.vbtn,.th,.sel,.vp{touch-action:manipulation}
+  .cov{touch-action:none}
+}
+@media (max-width:680px){
+  .sel{font-size:16px}
+}
 </style>
 </head>
 <body>
@@ -182,7 +221,7 @@ input[type=range]:disabled{opacity:.3;cursor:not-allowed}
         <button class="vbtn" onclick="togglePlay()">
           <svg id="pico" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
         </button>
-        <div class="vp" id="vp" onclick="seekV(event)">
+        <div class="vp" id="vp">
           <div class="vf" id="vf"></div>
         </div>
         <span class="vtm" id="vtm">0:00 / 0:00</span>
@@ -392,7 +431,13 @@ function loadV(file){
 
 function sizeVO(){
   const pw=document.getElementById('pview');
-  const mw=pw.clientWidth-48,mh=pw.clientHeight-72;
+  const cs=getComputedStyle(pw);
+  const padX=parseFloat(cs.paddingLeft)+parseFloat(cs.paddingRight);
+  const padY=parseFloat(cs.paddingTop)+parseFloat(cs.paddingBottom);
+  const vbar=document.querySelector('.vbar');
+  const stageGap=parseFloat(getComputedStyle(document.getElementById('stage')).rowGap)||14;
+  const reserveH=(vbar?vbar.offsetHeight:34)+stageGap;
+  const mw=pw.clientWidth-padX,mh=pw.clientHeight-padY-reserveH;
   const r=vid.videoWidth/vid.videoHeight;
   let w=mw,h=mw/r;if(h>mh){h=mh;w=h*r;}
   vo.style.width=w+'px';vo.style.height=h+'px';
@@ -400,9 +445,17 @@ function sizeVO(){
   if(anyEffectActive())renderPreview();
 }
 window.addEventListener('resize',()=>{if(vid.videoWidth)sizeVO()});
+window.addEventListener('orientationchange',()=>{if(vid.videoWidth)setTimeout(sizeVO,150)});
+if(window.visualViewport)window.visualViewport.addEventListener('resize',()=>{if(vid.videoWidth)sizeVO()});
 function fmt(s){s=isNaN(s)||!isFinite(s)?0:s;return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0')}
 function togglePlay(){if(!vid.src)return;if(vid.paused){vid.play();document.getElementById('pico').innerHTML='<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';}else{vid.pause();document.getElementById('pico').innerHTML='<path d="M8 5v14l11-7z"/>';}}
 function seekV(e){const r=document.getElementById('vp').getBoundingClientRect();vid.currentTime=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*vid.duration}
+let scrubbing=false;
+const vpEl=document.getElementById('vp');
+vpEl.addEventListener('pointerdown',e=>{if(!vid.src)return;scrubbing=true;vpEl.setPointerCapture(e.pointerId);seekV(e);});
+vpEl.addEventListener('pointermove',e=>{if(scrubbing)seekV(e);});
+vpEl.addEventListener('pointerup',e=>{scrubbing=false;try{vpEl.releasePointerCapture(e.pointerId);}catch(_){}});
+vpEl.addEventListener('pointercancel',()=>{scrubbing=false;});
 
 function detectFps(myGen){
   let det=30;
@@ -470,18 +523,21 @@ function startCrop(){
   if(!vid.src)return;
   isCropping=true;cov.classList.add('on');csel.style.display='none';
   document.getElementById('selBtn').textContent='Drawing…';
-  document.getElementById('cinf').textContent='Click and drag on the video';
+  document.getElementById('cinf').textContent='Drag on the video to draw a selection';
 }
 
-cov.addEventListener('mousedown',e=>{
+cov.addEventListener('pointerdown',e=>{
   if(!isCropping)return;
+  e.preventDefault();
+  cov.setPointerCapture(e.pointerId);
   const r=vo.getBoundingClientRect();
   cropStart={x:e.clientX-r.left,y:e.clientY-r.top};
   csel.style.display='block';
   Object.assign(csel.style,{left:cropStart.x+'px',top:cropStart.y+'px',width:'0',height:'0'});
 });
-cov.addEventListener('mousemove',e=>{
+cov.addEventListener('pointermove',e=>{
   if(!isCropping||!cropStart)return;
+  e.preventDefault();
   const r=vo.getBoundingClientRect();
   const cx=e.clientX-r.left,cy=e.clientY-r.top;
   const x=Math.min(cx,cropStart.x),y=Math.min(cy,cropStart.y);
@@ -491,9 +547,10 @@ cov.addEventListener('mousemove',e=>{
   const sx=vid.videoWidth/vo.clientWidth,sy=vid.videoHeight/vo.clientHeight;
   document.getElementById('cinf').textContent=Math.round(w*sx)+' × '+Math.round(h*sy)+' px';
 });
-cov.addEventListener('mouseup',()=>{
+cov.addEventListener('pointerup',e=>{
   if(!isCropping||!cropStart)return;
   isCropping=false;cropStart=null;
+  try{cov.releasePointerCapture(e.pointerId);}catch(_){}
   if(cropPx&&cropPx.w>5&&cropPx.h>5){
     const sx=vid.videoWidth/vo.clientWidth,sy=vid.videoHeight/vo.clientHeight;
     cropRect={x:Math.round(cropPx.x*sx),y:Math.round(cropPx.y*sy),w:Math.round(cropPx.w*sx),h:Math.round(cropPx.h*sy)};
@@ -503,6 +560,9 @@ cov.addEventListener('mouseup',()=>{
     document.getElementById('cinf').textContent=cropRect.w+'×'+cropRect.h+' at ('+cropRect.x+', '+cropRect.y+')';
   }else resetCropUI();
   cov.classList.remove('on');
+});
+cov.addEventListener('pointercancel',()=>{
+  isCropping=false;cropStart=null;resetCropUI();
 });
 
 function doApplyCrop(){
