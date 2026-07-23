@@ -315,6 +315,34 @@ input[type=range]:disabled{opacity:.3;cursor:not-allowed}
         </div>
       </div>
 
+      <div class="tool" id="tRoto">
+        <div class="th" tabindex="0" role="button" aria-label="Toggle panel" onclick="tog('tRoto')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();tog('tRoto')}">
+          <div class="thl">
+            <div class="ti"><svg viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></div>
+            <div><p class="tn">Rotoscope</p><p class="tst" id="rotoS">Traced cartoon outline look</p></div>
+          </div>
+          <svg class="chv" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="tb">
+          <div class="sr">
+            <div class="sh"><span class="sl">Edge threshold</span><span class="sv" id="rotoEdgeV">50</span></div>
+            <input type="range" id="rotoEdgeR" min="10" max="150" value="50" oninput="onRoto()">
+          </div>
+          <div class="sr">
+            <div class="sh"><span class="sl">Posterize colors</span><span class="sv" id="rotoColV">5</span></div>
+            <input type="range" id="rotoColR" min="2" max="12" value="5" oninput="onRoto()">
+          </div>
+          <p class="note">Flattens colors and traces dark outlines along edges, for a hand-drawn animation look. Lower edge threshold = more lines.</p>
+          <div class="btnrow">
+            <button class="rbtn" onclick="resetRoto()">Reset</button>
+            <button class="abtn" id="apRoto" disabled onclick="doApplyRoto()">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              Apply &amp; preview
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div class="tool" id="tFrames">
         <div class="th" tabindex="0" role="button" aria-label="Toggle panel" onclick="tog('tFrames')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();tog('tFrames')}">
           <div class="thl">
@@ -386,6 +414,9 @@ let isCropping=false,cropStart=null;
 let bit8Settings={pixelSize:8,colorLevels:8};
 let applied8bit=null;
 let bit8Offscreen=null;
+let rotoSettings={threshold:50,colorLevels:5};
+let appliedRoto=null;
+let rotoOffscreen=null;
 let previewLoopId=null;
 let previewUseRVFC=false;
 let lastDrawnMediaTime=-1;
@@ -409,7 +440,7 @@ function loadV(file){
   if(vUrl)URL.revokeObjectURL(vUrl);
   const myGen=++loadGen;
   vFile=file;appliedCrop=null;appliedFps=null;cropRect=null;cropPx=null;
-  resetCropUI();reset8bit();
+  resetCropUI();reset8bit();resetRoto();
   vUrl=URL.createObjectURL(file);
   vid.src=vUrl;
   vid.onloadedmetadata=()=>{
@@ -419,6 +450,7 @@ function loadV(file){
     document.getElementById('chgBtn').classList.remove('h');
     setExportBusy(false);
     document.getElementById('ap8bit').disabled=false;
+    document.getElementById('apRoto').disabled=false;
     document.getElementById('cropS').textContent=vid.videoWidth+'×'+vid.videoHeight;
     sizeVO();detectFps(myGen);updateFrameEst();
   };
@@ -638,13 +670,71 @@ function apply8BitEffect(ctx,w,h,settings){
   ctx.drawImage(off.canvas,0,0,sw,sh,0,0,w,h);
   ctx.imageSmoothingEnabled=true;
 }
+function getRotoOffscreen(sw,sh){
+  if(!rotoOffscreen||rotoOffscreen.w!==sw||rotoOffscreen.h!==sh){
+    const c=document.createElement('canvas');
+    c.width=sw;c.height=sh;
+    rotoOffscreen={canvas:c,ctx:c.getContext('2d'),w:sw,h:sh};
+  }
+  return rotoOffscreen;
+}
+function applyRotoscopeEffect(ctx,w,h,settings){
+  const{threshold,colorLevels}=settings;
+  // Work at a capped resolution — edge detection cost grows with pixel
+  // count, and a slightly softened base image also reads more like traced
+  // linework than a razor-sharp video frame.
+  const maxDim=320;
+  const scale=Math.max(1,Math.ceil(Math.max(w,h)/maxDim));
+  const sw=Math.max(2,Math.floor(w/scale)),sh=Math.max(2,Math.floor(h/scale));
+  const off=getRotoOffscreen(sw,sh);
+  off.ctx.imageSmoothingEnabled=true;
+  off.ctx.drawImage(ctx.canvas,0,0,w,h,0,0,sw,sh);
+
+  const img=off.ctx.getImageData(0,0,sw,sh);
+  const d=img.data;
+
+  // Grayscale buffer for edge detection.
+  const gray=new Uint8ClampedArray(sw*sh);
+  for(let i=0,p=0;i<d.length;i+=4,p++){
+    gray[p]=(d[i]*0.299+d[i+1]*0.587+d[i+2]*0.114)|0;
+  }
+
+  // Posterize the color image so shading collapses into flat regions.
+  const step=255/(colorLevels-1);
+  for(let i=0;i<d.length;i+=4){
+    d[i]=Math.round(d[i]/step)*step;
+    d[i+1]=Math.round(d[i+1]/step)*step;
+    d[i+2]=Math.round(d[i+2]/step)*step;
+  }
+
+  // Sobel gradient magnitude; paint an ink line wherever it exceeds the
+  // threshold. Border row/column left untouched (no full neighborhood).
+  for(let y=1;y<sh-1;y++){
+    const row=y*sw;
+    for(let x=1;x<sw-1;x++){
+      const i=row+x;
+      const gx=-gray[i-sw-1]+gray[i-sw+1]-2*gray[i-1]+2*gray[i+1]-gray[i+sw-1]+gray[i+sw+1];
+      const gy=-gray[i-sw-1]-2*gray[i-sw]-gray[i-sw+1]+gray[i+sw-1]+2*gray[i+sw]+gray[i+sw+1];
+      if(Math.abs(gx)+Math.abs(gy)>threshold){
+        const di=i*4;
+        d[di]=d[di+1]=d[di+2]=18;
+      }
+    }
+  }
+  off.ctx.putImageData(img,0,0);
+
+  ctx.imageSmoothingEnabled=true;
+  ctx.clearRect(0,0,w,h);
+  ctx.drawImage(off.canvas,0,0,sw,sh,0,0,w,h);
+}
 function drawVideoFrame(ctx,w,h){
   if(appliedCrop)ctx.drawImage(vid,appliedCrop.x,appliedCrop.y,appliedCrop.w,appliedCrop.h,0,0,w,h);
   else ctx.drawImage(vid,0,0,w,h);
   if(applied8bit)apply8BitEffect(ctx,w,h,applied8bit);
+  if(appliedRoto)applyRotoscopeEffect(ctx,w,h,appliedRoto);
 }
 function anyEffectActive(){
-  return!!(applied8bit||appliedFps);
+  return!!(applied8bit||appliedFps||appliedRoto);
 }
 function renderPreview(){
   if(!anyEffectActive()||!vid.src)return;
@@ -723,6 +813,30 @@ function reset8bit(){
   document.getElementById('bit8PxV').textContent='8px';
   document.getElementById('bit8ColV').textContent='8';
   document.getElementById('bit8S').textContent='Pixelated retro look';
+  lastDrawnMediaTime=-1;
+  startPreviewLoop();
+}
+function onRoto(){
+  rotoSettings.threshold=+document.getElementById('rotoEdgeR').value;
+  rotoSettings.colorLevels=+document.getElementById('rotoColR').value;
+  document.getElementById('rotoEdgeV').textContent=rotoSettings.threshold;
+  document.getElementById('rotoColV').textContent=rotoSettings.colorLevels;
+}
+function doApplyRoto(){
+  appliedRoto={...rotoSettings};
+  document.getElementById('rotoS').textContent='Edge '+appliedRoto.threshold+' · '+appliedRoto.colorLevels+' colors';
+  startPreviewLoop();
+  flash('apRoto','Rotoscope applied');
+  showProc('Applying rotoscope…',600);
+}
+function resetRoto(){
+  appliedRoto=null;
+  rotoSettings={threshold:50,colorLevels:5};
+  document.getElementById('rotoEdgeR').value=50;
+  document.getElementById('rotoColR').value=5;
+  document.getElementById('rotoEdgeV').textContent='50';
+  document.getElementById('rotoColV').textContent='5';
+  document.getElementById('rotoS').textContent='Traced cartoon outline look';
   lastDrawnMediaTime=-1;
   startPreviewLoop();
 }
