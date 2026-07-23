@@ -59,11 +59,11 @@ header{height:50px;padding:0 22px;display:flex;align-items:center;justify-conten
 .vbtn:hover{background:var(--bg2)}
 .vbtn svg{width:13px;height:13px;fill:var(--ink)}
 .vp{flex:1;height:3px;background:var(--bdr);border-radius:2px;cursor:pointer}
-.vf{height:100%;background:var(--ink);border-radius:2px;width:0%}
+.vf{height:100%;background:var(--ink);border-radius:2px;width:0%;transition:width .1s linear}
 .vtm{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);flex-shrink:0;min-width:72px;text-align:right}
 
-.proc{position:absolute;inset:0;background:rgba(8,8,8,.82);display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;border-radius:14px;z-index:30;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-.proc.on{display:flex}
+.proc{position:absolute;inset:0;background:rgba(8,8,8,.82);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;border-radius:14px;z-index:30;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .2s ease}
+.proc.on{opacity:1;pointer-events:auto}
 .pds{display:flex;gap:5px}
 .pd{width:6px;height:6px;border-radius:50%;background:var(--ink);animation:bl 1s ease-in-out infinite}
 .pd:nth-child(2){animation-delay:.15s}.pd:nth-child(3){animation-delay:.3s}
@@ -82,8 +82,10 @@ header{height:50px;padding:0 22px;display:flex;align-items:center;justify-conten
 .tst{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink3);margin-top:1px}
 .chv{width:14px;height:14px;stroke:var(--ink3);fill:none;stroke-width:2;transition:transform .2s}
 .tool.open .chv{transform:rotate(180deg)}
-.tb{display:none;padding:4px 16px 16px}
-.tool.open .tb{display:block}
+.tb{max-height:0;overflow:hidden;padding:0 16px;transition:max-height .28s ease,padding .28s ease}
+.tool.open .tb{max-height:600px;padding:4px 16px 16px}
+.th{outline:none}
+.th:focus-visible,.vbtn:focus-visible,.dzb:focus-visible,.chg:focus-visible,.abtn:focus-visible,.cb:focus-visible,.expbtn:focus-visible,.rbtn:focus-visible{outline:2px solid var(--ink2);outline-offset:2px}
 
 .sr{margin-bottom:12px}
 .sr:last-child{margin-bottom:0}
@@ -133,6 +135,10 @@ input[type=range]:disabled{opacity:.3;cursor:not-allowed}
 .btnrow{display:flex;gap:6px;margin-top:12px}
 .btnrow .abtn{margin-top:0;flex:2}
 .btnrow .rbtn{margin-top:0;flex:1;width:auto}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+}
 </style>
 </head>
 <body>
@@ -190,7 +196,7 @@ input[type=range]:disabled{opacity:.3;cursor:not-allowed}
     <div class="tools">
 
       <div class="tool" id="tFps">
-        <div class="th" onclick="tog('tFps')">
+        <div class="th" tabindex="0" role="button" aria-label="Toggle panel" onclick="tog('tFps')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();tog('tFps')}">
           <div class="thl">
             <div class="ti"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 6 12 12 15.5 15.5"/></svg></div>
             <div><p class="tn">Frame Rate</p><p class="tst" id="fpsS">Load a video first</p></div>
@@ -204,15 +210,18 @@ input[type=range]:disabled{opacity:.3;cursor:not-allowed}
             <input type="range" id="fpsR" min="1" max="29" value="12" disabled oninput="onFps()">
           </div>
           <p class="note">Export frame rate — capped 1 below source. Lower = choppier, stop-motion feel.</p>
-          <button class="abtn" id="apFps" disabled onclick="doFps()">
-            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-            Apply &amp; preview
-          </button>
+          <div class="btnrow">
+            <button class="rbtn" onclick="resetFps()">Reset</button>
+            <button class="abtn" id="apFps" disabled onclick="doFps()">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              Apply &amp; preview
+            </button>
+          </div>
         </div>
       </div>
 
       <div class="tool" id="tCrop">
-        <div class="th" onclick="tog('tCrop')">
+        <div class="th" tabindex="0" role="button" aria-label="Toggle panel" onclick="tog('tCrop')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();tog('tCrop')}">
           <div class="thl">
             <div class="ti"><svg viewBox="0 0 24 24"><polyline points="6 2 6 6 2 6"/><polyline points="18 2 18 6 22 6"/><polyline points="6 22 6 18 2 18"/><polyline points="18 22 18 18 22 18"/><rect x="6" y="6" width="12" height="12"/></svg></div>
             <div><p class="tn">Crop</p><p class="tst" id="cropS">Load a video first</p></div>
@@ -240,7 +249,7 @@ input[type=range]:disabled{opacity:.3;cursor:not-allowed}
       </div>
 
       <div class="tool" id="t8bit">
-        <div class="th" onclick="tog('t8bit')">
+        <div class="th" tabindex="0" role="button" aria-label="Toggle panel" onclick="tog('t8bit')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();tog('t8bit')}">
           <div class="thl">
             <div class="ti"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><rect x="14" y="14" width="6" height="6"/></svg></div>
             <div><p class="tn">8-Bit Style</p><p class="tst" id="bit8S">Pixelated retro look</p></div>
@@ -268,7 +277,7 @@ input[type=range]:disabled{opacity:.3;cursor:not-allowed}
       </div>
 
       <div class="tool" id="tFrames">
-        <div class="th" onclick="tog('tFrames')">
+        <div class="th" tabindex="0" role="button" aria-label="Toggle panel" onclick="tog('tFrames')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();tog('tFrames')}">
           <div class="thl">
             <div class="ti"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
             <div><p class="tn">Frame Generator</p><p class="tst" id="frameS">Extract frames as images</p></div>
@@ -303,20 +312,29 @@ input[type=range]:disabled{opacity:.3;cursor:not-allowed}
     </div>
 
     <div class="exps">
+      <div class="sr">
+        <div class="sh"><span class="sl">Export format</span></div>
+        <select class="sel" id="expFmt" onchange="onExpFmt()">
+          <option value="webm">WebM (VP9) — best quality</option>
+          <option value="mp4">MP4 (H.264) — most compatible</option>
+          <option value="gif">Animated GIF — for sharing</option>
+        </select>
+      </div>
       <button class="expbtn" id="expBtn" disabled onclick="exportV()">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg>
-        Export video
+        <span id="expBtnLbl">Export video</span>
       </button>
       <div class="eprog" id="eprog">
         <div class="epbar"><div class="epf" id="epf"></div></div>
         <p class="epl" id="epl">Preparing…</p>
       </div>
-      <p class="note">Exports as WebM. Use Chrome for best results.</p>
+      <p class="note" id="expNote">Exports as WebM. Use Chrome for best results.</p>
     </div>
   </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
 <script>
 const vid=document.getElementById('pv');
 const vo=document.getElementById('vo');
@@ -331,6 +349,8 @@ let applied8bit=null;
 let bit8Offscreen=null;
 let previewLoopId=null;
 let previewUseRVFC=false;
+let lastDrawnMediaTime=-1;
+let loadGen=0;
 
 function tog(id){
   const el=document.getElementById(id),was=el.classList.contains('open');
@@ -348,18 +368,20 @@ dz.addEventListener('click',e=>{if(e.target===dz)fi.click()});
 
 function loadV(file){
   if(vUrl)URL.revokeObjectURL(vUrl);
+  const myGen=++loadGen;
   vFile=file;appliedCrop=null;appliedFps=null;cropRect=null;cropPx=null;
   resetCropUI();reset8bit();
   vUrl=URL.createObjectURL(file);
   vid.src=vUrl;
   vid.onloadedmetadata=()=>{
+    if(myGen!==loadGen)return;
     dz.style.display='none';
     document.getElementById('stage').style.display='flex';
     document.getElementById('chgBtn').classList.remove('h');
     setExportBusy(false);
     document.getElementById('ap8bit').disabled=false;
     document.getElementById('cropS').textContent=vid.videoWidth+'×'+vid.videoHeight;
-    sizeVO();detectFps();updateFrameEst();
+    sizeVO();detectFps(myGen);updateFrameEst();
   };
   vid.ontimeupdate=()=>{
     document.getElementById('vf').style.width=(vid.currentTime/vid.duration*100)+'%';
@@ -375,18 +397,20 @@ function sizeVO(){
   let w=mw,h=mw/r;if(h>mh){h=mh;w=h*r;}
   vo.style.width=w+'px';vo.style.height=h+'px';
   vid.style.width=w+'px';vid.style.height=h+'px';
-  if(applied8bit)renderPreview();
+  if(anyEffectActive())renderPreview();
 }
 window.addEventListener('resize',()=>{if(vid.videoWidth)sizeVO()});
 function fmt(s){s=isNaN(s)||!isFinite(s)?0:s;return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0')}
 function togglePlay(){if(!vid.src)return;if(vid.paused){vid.play();document.getElementById('pico').innerHTML='<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';}else{vid.pause();document.getElementById('pico').innerHTML='<path d="M8 5v14l11-7z"/>';}}
 function seekV(e){const r=document.getElementById('vp').getBoundingClientRect();vid.currentTime=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*vid.duration}
 
-function detectFps(){
+function detectFps(myGen){
   let det=30;
+  const wasMuted=vid.muted;
   if(vid.requestVideoFrameCallback){
     const ts=[];
     function samp(now,m){
+      if(myGen!==loadGen)return;
       ts.push(m.mediaTime);
       if(ts.length<6){vid.requestVideoFrameCallback(samp);return;}
       const diffs=[];for(let i=1;i<ts.length;i++)diffs.push(ts[i]-ts[i-1]);
@@ -394,7 +418,15 @@ function detectFps(){
       const fps=Math.round(1/avg);if(fps>0&&fps<300)det=fps;
       vFps=det;setFpsUI();
     }
-    vid.play().then(()=>{vid.requestVideoFrameCallback(samp);setTimeout(()=>{vid.pause();vid.currentTime=0;},900)});
+    vid.muted=true;
+    vid.play().then(()=>{
+      if(myGen!==loadGen)return;
+      vid.requestVideoFrameCallback(samp);
+      setTimeout(()=>{
+        if(myGen!==loadGen)return;
+        vid.pause();vid.currentTime=0;vid.muted=wasMuted;
+      },900);
+    });
   }else{vFps=det;setFpsUI();}
 }
 
@@ -423,6 +455,15 @@ function doFps(){
   updateFrameEst();
   flash('apFps','Frame rate applied');
   showProc('Updating frame rate…',600);
+  lastDrawnMediaTime=-1;
+  startPreviewLoop();
+}
+function resetFps(){
+  appliedFps=null;
+  lastDrawnMediaTime=-1;
+  if(vFps)document.getElementById('fpsS').textContent='Source: '+vFps+' fps';
+  updateFrameEst();
+  startPreviewLoop();
 }
 
 function startCrop(){
@@ -478,7 +519,7 @@ function doApplyCrop(){
   document.getElementById('cropS').textContent=appliedCrop.w+'×'+appliedCrop.h+' px';
   document.getElementById('cinf').textContent='Preview showing cropped region';
   updateFrameEst();
-  if(applied8bit)renderPreview();
+  if(anyEffectActive())renderPreview();
   showProc('Applying crop…',600);
 }
 
@@ -487,7 +528,7 @@ function resetCrop(){
   Object.assign(vid.style,{position:'',left:'',top:''});
   document.getElementById('cropS').textContent=vid.videoWidth+'×'+vid.videoHeight;
   updateFrameEst();
-  if(applied8bit)renderPreview();
+  if(anyEffectActive())renderPreview();
 }
 function resetCropUI(){
   isCropping=false;cropStart=null;csel.style.display='none';cov.classList.remove('on');
@@ -519,18 +560,22 @@ function apply8BitEffect(ctx,w,h,settings){
   const off=getBit8Offscreen(sw,sh);
   off.ctx.imageSmoothingEnabled=false;
   off.ctx.drawImage(ctx.canvas,0,0,w,h,0,0,sw,sh);
-  ctx.imageSmoothingEnabled=false;
-  ctx.clearRect(0,0,w,h);
-  ctx.drawImage(off.canvas,0,0,sw,sh,0,0,w,h);
+
+  // Quantize colors on the small buffer (sw×sh pixels) instead of the
+  // full-size canvas — identical visual result, pixelSize² less work.
   const step=255/(colorLevels-1);
-  const img=ctx.getImageData(0,0,w,h);
+  const img=off.ctx.getImageData(0,0,sw,sh);
   const d=img.data;
   for(let i=0;i<d.length;i+=4){
     d[i]=Math.round(d[i]/step)*step;
     d[i+1]=Math.round(d[i+1]/step)*step;
     d[i+2]=Math.round(d[i+2]/step)*step;
   }
-  ctx.putImageData(img,0,0);
+  off.ctx.putImageData(img,0,0);
+
+  ctx.imageSmoothingEnabled=false;
+  ctx.clearRect(0,0,w,h);
+  ctx.drawImage(off.canvas,0,0,sw,sh,0,0,w,h);
   ctx.imageSmoothingEnabled=true;
 }
 function drawVideoFrame(ctx,w,h){
@@ -538,8 +583,11 @@ function drawVideoFrame(ctx,w,h){
   else ctx.drawImage(vid,0,0,w,h);
   if(applied8bit)apply8BitEffect(ctx,w,h,applied8bit);
 }
+function anyEffectActive(){
+  return!!(applied8bit||appliedFps);
+}
 function renderPreview(){
-  if(!applied8bit||!vid.src)return;
+  if(!anyEffectActive()||!vid.src)return;
   const{w,h}=getExportDimensions();
   pcv.width=w;pcv.height=h;
   pcv.style.width=vo.clientWidth+'px';
@@ -552,24 +600,45 @@ function stopPreviewLoop(){
     else cancelAnimationFrame(previewLoopId);
     previewLoopId=null;
   }
-  vid.removeEventListener('timeupdate',renderPreview);
   vid.classList.remove('hidden-vid');
   pcv.classList.remove('on');
 }
 function startPreviewLoop(){
   stopPreviewLoop();
-  if(!applied8bit||!vid.src)return;
+  if(!anyEffectActive()||!vid.src)return;
   vid.classList.add('hidden-vid');
   pcv.classList.add('on');
   renderPreview();
   if(vid.requestVideoFrameCallback){
     previewUseRVFC=true;
-    function frame(){renderPreview();if(applied8bit&&vid.src)previewLoopId=vid.requestVideoFrameCallback(frame);}
+    function frame(now,meta){
+      // When a target frame rate is applied, only redraw once enough
+      // media-time has elapsed — holding the prior frame in between is
+      // what actually produces the stop-motion look in the preview.
+      if(appliedFps){
+        const holdInterval=1/appliedFps;
+        if(meta.mediaTime-lastDrawnMediaTime>=holdInterval){
+          lastDrawnMediaTime=meta.mediaTime;
+          renderPreview();
+        }
+      }else{
+        renderPreview();
+      }
+      if(anyEffectActive()&&vid.src)previewLoopId=vid.requestVideoFrameCallback(frame);
+    }
     previewLoopId=vid.requestVideoFrameCallback(frame);
   }else{
     previewUseRVFC=false;
-    vid.addEventListener('timeupdate',renderPreview);
-    function loop(){renderPreview();if(applied8bit&&vid.src)previewLoopId=requestAnimationFrame(loop);}
+    let lastDrawnMs=-1;
+    function loop(ts){
+      if(appliedFps){
+        const holdMs=1000/appliedFps;
+        if(ts-lastDrawnMs>=holdMs){lastDrawnMs=ts;renderPreview();}
+      }else{
+        renderPreview();
+      }
+      if(anyEffectActive()&&vid.src)previewLoopId=requestAnimationFrame(loop);
+    }
     previewLoopId=requestAnimationFrame(loop);
   }
 }
@@ -594,7 +663,8 @@ function reset8bit(){
   document.getElementById('bit8PxV').textContent='8px';
   document.getElementById('bit8ColV').textContent='8';
   document.getElementById('bit8S').textContent='Pixelated retro look';
-  stopPreviewLoop();
+  lastDrawnMediaTime=-1;
+  startPreviewLoop();
 }
 function seekVideo(t){
   return new Promise(r=>{
@@ -655,39 +725,79 @@ function flash(id,msg){
   setTimeout(()=>{b.classList.remove('ok');b.innerHTML=orig;},1800);
 }
 
+function onExpFmt(){
+  const fmt=document.getElementById('expFmt').value;
+  const note=document.getElementById('expNote');
+  const btnLbl=document.getElementById('expBtnLbl');
+  if(fmt==='mp4'){
+    const ok=pickRecorderMime('mp4')?.startsWith('video/mp4');
+    note.textContent=ok?'Exports as MP4 (H.264).':"This browser can't record MP4 — will export as WebM instead.";
+    btnLbl.textContent='Export video';
+  }else if(fmt==='gif'){
+    note.textContent='Exports as an animated GIF, capped at 480px / 20fps to keep the file size reasonable.';
+    btnLbl.textContent='Export GIF';
+  }else{
+    note.textContent='Exports as WebM. Use Chrome for best results.';
+    btnLbl.textContent='Export video';
+  }
+}
+function pickRecorderMime(format){
+  const candidates=format==='mp4'
+    ?['video/mp4;codecs=avc1.4d002a','video/mp4;codecs=avc1','video/mp4']
+    :['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'];
+  for(const m of candidates)if(typeof MediaRecorder!=='undefined'&&MediaRecorder.isTypeSupported(m))return m;
+  if(format==='mp4'){
+    for(const m of['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm']){
+      if(typeof MediaRecorder!=='undefined'&&MediaRecorder.isTypeSupported(m))return m;
+    }
+  }
+  return null;
+}
+
 async function exportV(){
   if(!vid.src)return;
+  const requestedFmt=document.getElementById('expFmt').value;
+  if(requestedFmt==='gif')return exportGif();
+
   const prog=document.getElementById('eprog');
   const fill=document.getElementById('epf'),lbl=document.getElementById('epl');
-  const had8bit=!!applied8bit;
-  if(had8bit)stopPreviewLoop();
+  const hadEffect=anyEffectActive();
+  if(hadEffect)stopPreviewLoop();
   setExportBusy(true);prog.classList.add('on');
   const{w,h,fps}=getExportDimensions();
   const oc=document.createElement('canvas');oc.width=w;oc.height=h;
   const ox=oc.getContext('2d');
   let stream,recorder;
-  const mimeTypes=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'];
-  let mime='video/webm';
-  for(const m of mimeTypes){if(MediaRecorder.isTypeSupported(m)){mime=m;break;}}
+  const mime=pickRecorderMime(requestedFmt);
+  const ext=mime&&mime.startsWith('video/mp4')?'mp4':'webm';
+  if(!mime){lbl.textContent='Recording not supported in this browser.';setExportBusy(false);prog.classList.remove('on');if(hadEffect)startPreviewLoop();return;}
+  if(requestedFmt==='mp4'&&ext==='webm')lbl.textContent='MP4 unsupported — exporting WebM instead…';
   try{stream=oc.captureStream(fps);recorder=new MediaRecorder(stream,{mimeType:mime});}
-  catch(e){lbl.textContent='Use Chrome for export.';setExportBusy(false);if(had8bit)startPreviewLoop();return;}
+  catch(e){lbl.textContent='Use Chrome for export.';setExportBusy(false);prog.classList.remove('on');if(hadEffect)startPreviewLoop();return;}
   const chunks=[];
   recorder.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data)};
   recorder.onstop=()=>{
-    downloadBlob(new Blob(chunks,{type:'video/webm'}),(vFile?vFile.name.replace(/\.[^.]+$/,''):'video')+'_edited.webm');
+    downloadBlob(new Blob(chunks,{type:mime}),(vFile?vFile.name.replace(/\.[^.]+$/,''):'video')+'_edited.'+ext);
     prog.classList.remove('on');setExportBusy(false);
     lbl.textContent='Done!';
-    if(had8bit)startPreviewLoop();
+    if(hadEffect){lastDrawnMediaTime=-1;startPreviewLoop();}
     setTimeout(()=>lbl.textContent='Preparing…',2500);
   };
   vid.currentTime=0;await seekVideo(0);
   vid.muted=true;await vid.play();recorder.start();
-  const dur=vid.duration,interval=1000/fps;let lt=0;
+  const dur=vid.duration,interval=1000/fps;
+  let lastTs=null,acc=0;
   function loop(ts){
     if(vid.ended||vid.currentTime>=dur){vid.pause();setTimeout(()=>recorder.stop(),200);return;}
-    if(ts-lt<interval){requestAnimationFrame(loop);return;}
-    lt=ts;
-    drawVideoFrame(ox,w,h);
+    if(lastTs===null)lastTs=ts;
+    acc+=ts-lastTs;lastTs=ts;
+    // Accumulator keeps the capture locked to the true target fps instead
+    // of drifting from rAF timing jitter over a long export.
+    let drewThisTick=false;
+    while(acc>=interval){
+      acc-=interval;
+      if(!drewThisTick){drawVideoFrame(ox,w,h);drewThisTick=true;}
+    }
     fill.style.width=Math.round(vid.currentTime/dur*100)+'%';
     lbl.textContent='Exporting… '+Math.round(vid.currentTime/dur*100)+'%';
     requestAnimationFrame(loop);
@@ -695,12 +805,60 @@ async function exportV(){
   requestAnimationFrame(loop);
 }
 
+async function exportGif(){
+  if(!vid.src)return;
+  const prog=document.getElementById('eprog');
+  const fill=document.getElementById('epf'),lbl=document.getElementById('epl');
+  if(typeof GIF==='undefined'){lbl.textContent='GIF library failed to load — check your connection.';return;}
+  const hadEffect=anyEffectActive();
+  if(hadEffect)stopPreviewLoop();
+  setExportBusy(true);prog.classList.add('on');
+  const{w,h,fps}=getExportDimensions();
+  const gifFps=Math.min(fps,20);
+  const scale=Math.min(1,480/Math.max(w,h));
+  const gw=Math.max(1,Math.round(w*scale)),gh=Math.max(1,Math.round(h*scale));
+  const full=document.createElement('canvas');full.width=w;full.height=h;
+  const fullCtx=full.getContext('2d');
+  const oc=document.createElement('canvas');oc.width=gw;oc.height=gh;
+  const ox=oc.getContext('2d');
+  const gif=new GIF({
+    workers:2,quality:10,width:gw,height:gh,
+    workerScript:'https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js'
+  });
+  const wasMuted=vid.muted,wasPaused=vid.paused,savedTime=vid.currentTime;
+  vid.muted=true;vid.pause();
+  const totalFrames=Math.max(1,Math.floor(vid.duration*gifFps));
+  const delay=Math.round(1000/gifFps);
+  for(let i=0;i<totalFrames;i++){
+    await seekVideo(i/gifFps);
+    drawVideoFrame(fullCtx,w,h);
+    ox.clearRect(0,0,gw,gh);
+    ox.drawImage(full,0,0,w,h,0,0,gw,gh);
+    gif.addFrame(ox,{copy:true,delay});
+    const pct=Math.round((i+1)/totalFrames*70);
+    fill.style.width=pct+'%';lbl.textContent='Capturing frames… '+pct+'%';
+  }
+  gif.on('progress',p=>{
+    const pct=70+Math.round(p*30);
+    fill.style.width=pct+'%';lbl.textContent='Encoding GIF… '+pct+'%';
+  });
+  gif.on('finished',blob=>{
+    downloadBlob(blob,(vFile?vFile.name.replace(/\.[^.]+$/,''):'video')+'_edited.gif');
+    vid.currentTime=savedTime;vid.muted=wasMuted;if(!wasPaused)vid.play();
+    prog.classList.remove('on');setExportBusy(false);
+    lbl.textContent='Done!';
+    if(hadEffect){lastDrawnMediaTime=-1;startPreviewLoop();}
+    setTimeout(()=>{lbl.textContent='Preparing…';fill.style.width='0%';},2500);
+  });
+  gif.render();
+}
+
 async function exportFrames(){
   if(!vid.src||typeof JSZip==='undefined')return;
   const prog=document.getElementById('eprog');
   const fill=document.getElementById('epf'),lbl=document.getElementById('epl');
-  const had8bit=!!applied8bit;
-  if(had8bit)stopPreviewLoop();
+  const hadEffect=anyEffectActive();
+  if(hadEffect)stopPreviewLoop();
   setExportBusy(true);prog.classList.add('on');
   const format=document.getElementById('frameFmt').value;
   const quality=+document.getElementById('frameQ').value;
@@ -719,7 +877,7 @@ async function exportFrames(){
     await seekVideo(i/fps);
     drawVideoFrame(ox,w,h);
     const blob=await new Promise(res=>oc.toBlob(res,mime,quality));
-    if(!blob){lbl.textContent='Format not supported in this browser.';prog.classList.remove('on');setExportBusy(false);vid.currentTime=savedTime;vid.muted=wasMuted;if(!wasPaused)vid.play();if(had8bit)startPreviewLoop();return;}
+    if(!blob){lbl.textContent='Format not supported in this browser.';prog.classList.remove('on');setExportBusy(false);vid.currentTime=savedTime;vid.muted=wasMuted;if(!wasPaused)vid.play();if(hadEffect)startPreviewLoop();return;}
     zip.file('frame_'+String(frameIndex).padStart(5,'0')+'.'+ext,blob);
     frameIndex++;
     fill.style.width=Math.round(frameIndex/getFrameCount()*100)+'%';
@@ -734,7 +892,7 @@ async function exportFrames(){
   downloadBlob(zipBlob,(vFile?vFile.name.replace(/\.[^.]+$/,''):'video')+'_frames.zip');
   vid.currentTime=savedTime;vid.muted=wasMuted;if(!wasPaused)vid.play();
   prog.classList.remove('on');setExportBusy(false);
-  if(had8bit)startPreviewLoop();
+  if(hadEffect)startPreviewLoop();
   lbl.textContent='Done!';
   setTimeout(()=>{lbl.textContent='Preparing…';fill.style.width='0%';},2500);
 }
