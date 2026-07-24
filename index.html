@@ -116,6 +116,15 @@ input[type=range]:disabled{opacity:.3;cursor:not-allowed}
 
 .sel{width:100%;padding:7px 9px;border-radius:var(--rs);border:1px solid var(--bdr);background:var(--surf);font-size:11px;font-family:inherit;color:var(--ink);cursor:pointer;outline:none}
 .sel:focus{border-color:var(--ink3)}
+.crow{display:flex;gap:14px;margin-top:2px}
+.cwrap{display:flex;flex-direction:column;align-items:center;gap:5px}
+.cwrap span{font-size:9px;color:var(--ink3);text-transform:uppercase;letter-spacing:.02em}
+.clr{-webkit-appearance:none;appearance:none;width:40px;height:26px;border:1px solid var(--bdr);border-radius:6px;background:none;cursor:pointer;padding:0}
+.clr::-webkit-color-swatch-wrapper{padding:2px}
+.clr::-webkit-color-swatch{border:none;border-radius:4px}
+.clr::-moz-color-swatch{border:none;border-radius:4px}
+.clr:focus-visible{outline:2px solid var(--ink2);outline-offset:2px}
+.clr:disabled{opacity:.3;cursor:not-allowed}
 
 .note{font-size:10px;color:var(--ink3);line-height:1.6;margin-top:6px}
 
@@ -297,6 +306,18 @@ input[type=range]:disabled{opacity:.3;cursor:not-allowed}
         </div>
         <div class="tb">
           <div class="sr">
+            <div class="sh"><span class="sl">Style</span></div>
+            <select class="sel" id="bit8Style" onchange="onBit8Style()">
+              <option value="custom">Custom</option>
+              <option value="gameboy">Game Boy (4-shade green)</option>
+              <option value="cga">CGA (cyan / magenta / white)</option>
+              <option value="c64">Commodore 64 (16-color)</option>
+              <option value="grayscale">Grayscale</option>
+              <option value="sepia">Sepia</option>
+              <option value="vaporwave">Vaporwave (purple / cyan)</option>
+            </select>
+          </div>
+          <div class="sr">
             <div class="sh"><span class="sl">Pixel size</span><span class="sv" id="bit8PxV">8px</span></div>
             <input type="range" id="bit8PxR" min="4" max="32" value="8" oninput="onBit8()">
           </div>
@@ -304,7 +325,16 @@ input[type=range]:disabled{opacity:.3;cursor:not-allowed}
             <div class="sh"><span class="sl">Color levels</span><span class="sv" id="bit8ColV">8</span></div>
             <input type="range" id="bit8ColR" min="2" max="16" value="8" oninput="onBit8()">
           </div>
+          <div class="sr">
+            <div class="sh"><span class="sl">Duotone strength</span><span class="sv" id="bit8DuoV">Off</span></div>
+            <div class="crow">
+              <label class="cwrap"><input type="color" class="clr" id="bit8ShadowC" value="#1a1a2e" oninput="onBit8()"><span>Shadow</span></label>
+              <label class="cwrap"><input type="color" class="clr" id="bit8HighC" value="#ffe66d" oninput="onBit8()"><span>Highlight</span></label>
+            </div>
+            <input type="range" id="bit8DuoR" min="0" max="100" value="0" oninput="onBit8()" style="margin-top:8px">
+          </div>
           <p class="note">Chunky pixels + reduced palette. Applies to preview, export, and frame ZIP.</p>
+          <p class="note" style="margin-top:2px">Pick a style for an authentic retro palette, or go Custom and set your own pixel size / colors / duotone. Game Boy, CGA, and C64 snap to their real fixed palettes; tweaking any control after picking a style switches back to Custom.</p>
           <div class="btnrow">
             <button class="rbtn" onclick="reset8bit()">Reset</button>
             <button class="abtn" id="ap8bit" disabled onclick="doApply8bit()">
@@ -332,10 +362,126 @@ input[type=range]:disabled{opacity:.3;cursor:not-allowed}
             <div class="sh"><span class="sl">Posterize colors</span><span class="sv" id="rotoColV">5</span></div>
             <input type="range" id="rotoColR" min="2" max="12" value="5" oninput="onRoto()">
           </div>
+          <div class="sr">
+            <div class="sh"><span class="sl">Fill tint</span><span class="sv" id="rotoFillV">Off</span></div>
+            <div class="crow">
+              <label class="cwrap"><input type="color" class="clr" id="rotoLineC" value="#121212" oninput="onRoto()"><span>Line</span></label>
+              <label class="cwrap"><input type="color" class="clr" id="rotoFillC" value="#ff5470" oninput="onRoto()"><span>Fill</span></label>
+            </div>
+            <input type="range" id="rotoFillR" min="0" max="100" value="0" oninput="onRoto()" style="margin-top:8px">
+          </div>
           <p class="note">Flattens colors and traces dark outlines along edges, for a hand-drawn animation look. Lower edge threshold = more lines.</p>
+          <p class="note" style="margin-top:2px">Line sets the outline ink color. Fill tint blends the flat color regions toward a chosen color — great for a poster/stencil look.</p>
           <div class="btnrow">
             <button class="rbtn" onclick="resetRoto()">Reset</button>
             <button class="abtn" id="apRoto" disabled onclick="doApplyRoto()">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              Apply &amp; preview
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="tool" id="tIR">
+        <div class="th" tabindex="0" role="button" aria-label="Toggle panel" onclick="tog('tIR')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();tog('tIR')}">
+          <div class="thl">
+            <div class="ti"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.07" y2="4.93"/></svg></div>
+            <div><p class="tn">Infrared</p><p class="tst" id="irS">False-color IR look</p></div>
+          </div>
+          <svg class="chv" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="tb">
+          <div class="sr">
+            <div class="sh"><span class="sl">Intensity</span><span class="sv" id="irIntV">100%</span></div>
+            <input type="range" id="irIntR" min="0" max="100" value="100" oninput="onIR()">
+          </div>
+          <div class="sr">
+            <div class="sh"><span class="sl">White point</span><span class="sv" id="irThrV">50</span></div>
+            <input type="range" id="irThrR" min="0" max="100" value="50" oninput="onIR()">
+          </div>
+          <div class="sr">
+            <div class="sh"><span class="sl">False-color gradient</span></div>
+            <div class="crow">
+              <label class="cwrap"><input type="color" class="clr" id="irShadowC" value="#1a0505" oninput="onIR()"><span>Shadow</span></label>
+              <label class="cwrap"><input type="color" class="clr" id="irHighC" value="#ffccdd" oninput="onIR()"><span>Highlight</span></label>
+            </div>
+          </div>
+          <p class="note">Simulates infrared film: warm tones and foliage glow toward the highlight color, cool tones sink toward the shadow color. White point sets how quickly midtones blow out.</p>
+          <div class="btnrow">
+            <button class="rbtn" onclick="resetIR()">Reset</button>
+            <button class="abtn" id="apIR" disabled onclick="doApplyIR()">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              Apply &amp; preview
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="tool" id="tHeat">
+        <div class="th" tabindex="0" role="button" aria-label="Toggle panel" onclick="tog('tHeat')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();tog('tHeat')}">
+          <div class="thl">
+            <div class="ti"><svg viewBox="0 0 24 24"><path d="M14 4v10.54a4 4 0 11-4 0V4a2 2 0 014 0z"/><line x1="12" y1="4" x2="12" y2="10"/></svg></div>
+            <div><p class="tn">Heat Map</p><p class="tst" id="heatS">Thermal-camera style</p></div>
+          </div>
+          <svg class="chv" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="tb">
+          <div class="sr">
+            <div class="sh"><span class="sl">Palette</span></div>
+            <select class="sel" id="heatPal" onchange="onHeat()">
+              <option value="classic">Classic (blue → red → yellow)</option>
+              <option value="iron">Iron (black → orange → white)</option>
+              <option value="arctic">Arctic (black → cyan → white)</option>
+              <option value="custom">Custom…</option>
+            </select>
+          </div>
+          <div class="sr" id="heatCustomRow" style="display:none">
+            <div class="sh"><span class="sl">Custom gradient</span></div>
+            <div class="crow">
+              <label class="cwrap"><input type="color" class="clr" id="heatColdC" value="#0a0a2a" oninput="onHeat()"><span>Cold</span></label>
+              <label class="cwrap"><input type="color" class="clr" id="heatMidC" value="#ff2e63" oninput="onHeat()"><span>Mid</span></label>
+              <label class="cwrap"><input type="color" class="clr" id="heatHotC" value="#ffec3d" oninput="onHeat()"><span>Hot</span></label>
+            </div>
+          </div>
+          <div class="sr">
+            <div class="sh"><span class="sl">Sensitivity</span><span class="sv" id="heatSensV">50</span></div>
+            <input type="range" id="heatSensR" min="10" max="150" value="50" oninput="onHeat()">
+          </div>
+          <p class="note">Recolors brightness into a thermal-style gradient. Higher sensitivity pushes mid-brightness areas harder toward the palette's hot/cold extremes.</p>
+          <div class="btnrow">
+            <button class="rbtn" onclick="resetHeat()">Reset</button>
+            <button class="abtn" id="apHeat" disabled onclick="doApplyHeat()">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              Apply &amp; preview
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="tool" id="tNeg">
+        <div class="th" tabindex="0" role="button" aria-label="Toggle panel" onclick="tog('tNeg')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();tog('tNeg')}">
+          <div class="thl">
+            <div class="ti"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 010 18z" style="fill:var(--ink2)"/></svg></div>
+            <div><p class="tn">Negative</p><p class="tst" id="negS">Inverted colors</p></div>
+          </div>
+          <svg class="chv" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="tb">
+          <div class="sr">
+            <div class="sh"><span class="sl">Intensity</span><span class="sv" id="negIntV">100%</span></div>
+            <input type="range" id="negIntR" min="0" max="100" value="100" oninput="onNeg()">
+          </div>
+          <div class="sr">
+            <div class="sh"><span class="sl">Tint strength</span><span class="sv" id="negTintV">Off</span></div>
+            <div class="crow">
+              <label class="cwrap"><input type="color" class="clr" id="negTintC" value="#ff3366" oninput="onNeg()"><span>Tint</span></label>
+            </div>
+            <input type="range" id="negTintR" min="0" max="100" value="0" oninput="onNeg()" style="margin-top:8px">
+          </div>
+          <p class="note">Inverts every color channel, like a photo negative. Lower intensity blends it with the original footage. Tint strength colorizes the inverted result toward a chosen color.</p>
+          <div class="btnrow">
+            <button class="rbtn" onclick="resetNeg()">Reset</button>
+            <button class="abtn" id="apNeg" disabled onclick="doApplyNeg()">
               <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
               Apply &amp; preview
             </button>
@@ -411,12 +557,37 @@ const csel=document.getElementById('csel');
 let vFile=null,vUrl=null,vFps=30,tgtFps=15;
 let cropRect=null,cropPx=null,appliedCrop=null,appliedFps=null;
 let isCropping=false,cropStart=null;
-let bit8Settings={pixelSize:8,colorLevels:8};
+let bit8Settings={pixelSize:8,colorLevels:8,duoStrength:0,shadowColor:'#1a1a2e',highlightColor:'#ffe66d',paletteKey:null};
 let applied8bit=null;
 let bit8Offscreen=null;
-let rotoSettings={threshold:50,colorLevels:5};
+let bit8ApplyingPreset=false;
+const PALETTES={
+  gameboy:[[15,56,15],[48,98,48],[139,172,15],[155,188,15]],
+  cga:[[0,0,0],[85,255,255],[255,85,255],[255,255,255]],
+  c64:[[0,0,0],[255,255,255],[129,51,56],[117,206,200],[142,60,151],[86,172,77],[46,44,155],[237,241,113],[142,80,41],[85,56,0],[196,108,113],[74,74,74],[123,123,123],[169,255,159],[112,109,235],[178,178,178]]
+};
+const BIT8_PRESETS={
+  gameboy:{pixelSize:6,colorLevels:4,duoStrength:0,shadowColor:'#0f380f',highlightColor:'#9bbc0f',palette:'gameboy'},
+  cga:{pixelSize:6,colorLevels:4,duoStrength:0,shadowColor:'#000000',highlightColor:'#ffffff',palette:'cga'},
+  c64:{pixelSize:5,colorLevels:16,duoStrength:0,shadowColor:'#000000',highlightColor:'#ffffff',palette:'c64'},
+  grayscale:{pixelSize:8,colorLevels:6,duoStrength:100,shadowColor:'#000000',highlightColor:'#ffffff',palette:null},
+  sepia:{pixelSize:8,colorLevels:6,duoStrength:100,shadowColor:'#2b1a0e',highlightColor:'#f4e0b9',palette:null},
+  vaporwave:{pixelSize:8,colorLevels:6,duoStrength:100,shadowColor:'#2d0a4e',highlightColor:'#7ef9ff',palette:null}
+};
+let rotoSettings={threshold:50,colorLevels:5,lineColor:'#121212',fillColor:'#ff5470',fillStrength:0};
 let appliedRoto=null;
 let rotoOffscreen=null;
+let irSettings={intensity:100,threshold:50,shadowColor:'#1a0505',highlightColor:'#ffccdd'};
+let appliedIR=null;
+let heatSettings={palette:'classic',sensitivity:50,coldColor:'#0a0a2a',midColor:'#ff2e63',hotColor:'#ffec3d'};
+let appliedHeat=null;
+let negSettings={intensity:100,tintColor:'#ff3366',tintStrength:0};
+let appliedNeg=null;
+const HEATMAPS={
+  classic:[[0,0,80],[0,0,255],[0,255,255],[0,255,0],[255,255,0],[255,128,0],[255,0,0]],
+  iron:[[0,0,0],[60,0,80],[130,0,120],[200,30,20],[255,120,0],[255,200,0],[255,255,255]],
+  arctic:[[0,0,20],[0,40,120],[0,150,220],[120,220,255],[255,255,255]]
+};
 let previewLoopId=null;
 let previewUseRVFC=false;
 let lastDrawnMediaTime=-1;
@@ -440,7 +611,7 @@ function loadV(file){
   if(vUrl)URL.revokeObjectURL(vUrl);
   const myGen=++loadGen;
   vFile=file;appliedCrop=null;appliedFps=null;cropRect=null;cropPx=null;
-  resetCropUI();reset8bit();resetRoto();
+  resetCropUI();reset8bit();resetRoto();resetIR();resetHeat();resetNeg();
   vUrl=URL.createObjectURL(file);
   vid.src=vUrl;
   vid.onloadedmetadata=()=>{
@@ -451,6 +622,9 @@ function loadV(file){
     setExportBusy(false);
     document.getElementById('ap8bit').disabled=false;
     document.getElementById('apRoto').disabled=false;
+    document.getElementById('apIR').disabled=false;
+    document.getElementById('apHeat').disabled=false;
+    document.getElementById('apNeg').disabled=false;
     document.getElementById('cropS').textContent=vid.videoWidth+'×'+vid.videoHeight;
     sizeVO();detectFps(myGen);updateFrameEst();
   };
@@ -645,23 +819,56 @@ function getBit8Offscreen(sw,sh){
   }
   return bit8Offscreen;
 }
+function hex2rgb(hex){
+  const n=parseInt(hex.slice(1),16);
+  return[(n>>16)&255,(n>>8)&255,n&255];
+}
+function nearestPaletteColor(pal,r,g,b){
+  let best=pal[0],bestD=Infinity;
+  for(let k=0;k<pal.length;k++){
+    const c=pal[k];
+    const dr=r-c[0],dg=g-c[1],db=b-c[2];
+    const dist=dr*dr+dg*dg+db*db;
+    if(dist<bestD){bestD=dist;best=c;}
+  }
+  return best;
+}
 function apply8BitEffect(ctx,w,h,settings){
-  const{pixelSize,colorLevels}=settings;
+  const{pixelSize,colorLevels,duoStrength,shadowColor,highlightColor,paletteKey}=settings;
   const sw=Math.max(1,Math.floor(w/pixelSize));
   const sh=Math.max(1,Math.floor(h/pixelSize));
   const off=getBit8Offscreen(sw,sh);
   off.ctx.imageSmoothingEnabled=false;
   off.ctx.drawImage(ctx.canvas,0,0,w,h,0,0,sw,sh);
 
-  // Quantize colors on the small buffer (sw×sh pixels) instead of the
-  // full-size canvas — identical visual result, pixelSize² less work.
-  const step=255/(colorLevels-1);
   const img=off.ctx.getImageData(0,0,sw,sh);
   const d=img.data;
-  for(let i=0;i<d.length;i+=4){
-    d[i]=Math.round(d[i]/step)*step;
-    d[i+1]=Math.round(d[i+1]/step)*step;
-    d[i+2]=Math.round(d[i+2]/step)*step;
+  const pal=paletteKey?PALETTES[paletteKey]:null;
+  if(pal){
+    // Fixed retro palette (Game Boy / CGA / C64 etc.): snap every pixel to
+    // its nearest palette entry instead of channel-quantizing.
+    for(let i=0;i<d.length;i+=4){
+      const c=nearestPaletteColor(pal,d[i],d[i+1],d[i+2]);
+      d[i]=c[0];d[i+1]=c[1];d[i+2]=c[2];
+    }
+  }else{
+    // Quantize colors on the small buffer (sw×sh pixels) instead of the
+    // full-size canvas — identical visual result, pixelSize² less work.
+    // Optionally recolor by brightness into a two-color duotone in the same pass.
+    const step=255/(colorLevels-1);
+    const duoT=(duoStrength||0)/100;
+    const sc=duoT>0?hex2rgb(shadowColor):null,hc=duoT>0?hex2rgb(highlightColor):null;
+    for(let i=0;i<d.length;i+=4){
+      let r=Math.round(d[i]/step)*step;
+      let g=Math.round(d[i+1]/step)*step;
+      let b=Math.round(d[i+2]/step)*step;
+      if(duoT>0){
+        const lum=(r*0.299+g*0.587+b*0.114)/255;
+        const dr=sc[0]+(hc[0]-sc[0])*lum,dg=sc[1]+(hc[1]-sc[1])*lum,db=sc[2]+(hc[2]-sc[2])*lum;
+        r+=(dr-r)*duoT;g+=(dg-g)*duoT;b+=(db-b)*duoT;
+      }
+      d[i]=r;d[i+1]=g;d[i+2]=b;
+    }
   }
   off.ctx.putImageData(img,0,0);
 
@@ -679,7 +886,7 @@ function getRotoOffscreen(sw,sh){
   return rotoOffscreen;
 }
 function applyRotoscopeEffect(ctx,w,h,settings){
-  const{threshold,colorLevels}=settings;
+  const{threshold,colorLevels,lineColor,fillColor,fillStrength}=settings;
   // Work at a capped resolution — edge detection cost grows with pixel
   // count, and a slightly softened base image also reads more like traced
   // linework than a razor-sharp video frame.
@@ -699,16 +906,22 @@ function applyRotoscopeEffect(ctx,w,h,settings){
     gray[p]=(d[i]*0.299+d[i+1]*0.587+d[i+2]*0.114)|0;
   }
 
-  // Posterize the color image so shading collapses into flat regions.
+  // Posterize the color image so shading collapses into flat regions,
+  // optionally blending each region toward a chosen fill color.
   const step=255/(colorLevels-1);
+  const fillT=(fillStrength||0)/100;
+  const fc=fillT>0?hex2rgb(fillColor):null;
   for(let i=0;i<d.length;i+=4){
-    d[i]=Math.round(d[i]/step)*step;
-    d[i+1]=Math.round(d[i+1]/step)*step;
-    d[i+2]=Math.round(d[i+2]/step)*step;
+    let r=Math.round(d[i]/step)*step;
+    let g=Math.round(d[i+1]/step)*step;
+    let b=Math.round(d[i+2]/step)*step;
+    if(fillT>0){r+=(fc[0]-r)*fillT;g+=(fc[1]-g)*fillT;b+=(fc[2]-b)*fillT;}
+    d[i]=r;d[i+1]=g;d[i+2]=b;
   }
 
   // Sobel gradient magnitude; paint an ink line wherever it exceeds the
   // threshold. Border row/column left untouched (no full neighborhood).
+  const lc=hex2rgb(lineColor||'#121212');
   for(let y=1;y<sh-1;y++){
     const row=y*sw;
     for(let x=1;x<sw-1;x++){
@@ -717,7 +930,7 @@ function applyRotoscopeEffect(ctx,w,h,settings){
       const gy=-gray[i-sw-1]-2*gray[i-sw]-gray[i-sw+1]+gray[i+sw-1]+2*gray[i+sw]+gray[i+sw+1];
       if(Math.abs(gx)+Math.abs(gy)>threshold){
         const di=i*4;
-        d[di]=d[di+1]=d[di+2]=18;
+        d[di]=lc[0];d[di+1]=lc[1];d[di+2]=lc[2];
       }
     }
   }
@@ -727,14 +940,87 @@ function applyRotoscopeEffect(ctx,w,h,settings){
   ctx.clearRect(0,0,w,h);
   ctx.drawImage(off.canvas,0,0,sw,sh,0,0,w,h);
 }
+function applyInfraredEffect(ctx,w,h,settings){
+  const{intensity,threshold,shadowColor,highlightColor}=settings;
+  const mixT=intensity/100;
+  if(mixT<=0)return;
+  // Gamma-like curve around the white-point: >0.5 threshold delays blowout,
+  // <0.5 pushes midtones toward white sooner (mimics different IR film stock).
+  const gammaExp=1+(0.5-threshold/100)*1.5;
+  const sc=hex2rgb(shadowColor||'#1a0505'),hc=hex2rgb(highlightColor||'#ffccdd');
+  const img=ctx.getImageData(0,0,w,h);
+  const d=img.data;
+  for(let i=0;i<d.length;i+=4){
+    const r=d[i],g=d[i+1],b=d[i+2];
+    // Near-IR photography: chlorophyll/foliage reflects strongly, so weight
+    // green heavily; skies (mostly blue) stay comparatively dark.
+    let irLum=(r*0.25+g*0.65+b*0.10)/255;
+    irLum=Math.min(1,Math.max(0,Math.pow(irLum,gammaExp)));
+    const nr=sc[0]+(hc[0]-sc[0])*irLum;
+    const ng=sc[1]+(hc[1]-sc[1])*irLum;
+    const nb=sc[2]+(hc[2]-sc[2])*irLum;
+    d[i]=r+(nr-r)*mixT;
+    d[i+1]=g+(ng-g)*mixT;
+    d[i+2]=b+(nb-b)*mixT;
+  }
+  ctx.putImageData(img,0,0);
+}
+function heatColor(stops,t){
+  t=Math.min(1,Math.max(0,t));
+  const n=stops.length-1;
+  const pos=t*n;
+  const idx=Math.min(n-1,Math.floor(pos));
+  const frac=pos-idx;
+  const c0=stops[idx],c1=stops[idx+1];
+  return[
+    c0[0]+(c1[0]-c0[0])*frac,
+    c0[1]+(c1[1]-c0[1])*frac,
+    c0[2]+(c1[2]-c0[2])*frac
+  ];
+}
+function applyHeatmapEffect(ctx,w,h,settings){
+  const{palette,sensitivity,coldColor,midColor,hotColor}=settings;
+  const stops=palette==='custom'
+    ?[hex2rgb(coldColor),hex2rgb(midColor),hex2rgb(hotColor)]
+    :(HEATMAPS[palette]||HEATMAPS.classic);
+  const contrast=sensitivity/50; // 1.0 at the neutral default (50)
+  const img=ctx.getImageData(0,0,w,h);
+  const d=img.data;
+  for(let i=0;i<d.length;i+=4){
+    let lum=(d[i]*0.299+d[i+1]*0.587+d[i+2]*0.114)/255;
+    lum=0.5+(lum-0.5)*contrast; // stretch/compress around midpoint
+    const c=heatColor(stops,lum);
+    d[i]=c[0];d[i+1]=c[1];d[i+2]=c[2];
+  }
+  ctx.putImageData(img,0,0);
+}
+function applyNegativeEffect(ctx,w,h,settings){
+  const mixT=settings.intensity/100;
+  const tintT=(settings.tintStrength||0)/100;
+  if(mixT<=0&&tintT<=0)return;
+  const tc=tintT>0?hex2rgb(settings.tintColor):null;
+  const img=ctx.getImageData(0,0,w,h);
+  const d=img.data;
+  for(let i=0;i<d.length;i+=4){
+    let r=d[i]+(255-d[i]-d[i])*mixT;
+    let g=d[i+1]+(255-d[i+1]-d[i+1])*mixT;
+    let b=d[i+2]+(255-d[i+2]-d[i+2])*mixT;
+    if(tintT>0){r+=(tc[0]-r)*tintT;g+=(tc[1]-g)*tintT;b+=(tc[2]-b)*tintT;}
+    d[i]=r;d[i+1]=g;d[i+2]=b;
+  }
+  ctx.putImageData(img,0,0);
+}
 function drawVideoFrame(ctx,w,h){
   if(appliedCrop)ctx.drawImage(vid,appliedCrop.x,appliedCrop.y,appliedCrop.w,appliedCrop.h,0,0,w,h);
   else ctx.drawImage(vid,0,0,w,h);
   if(applied8bit)apply8BitEffect(ctx,w,h,applied8bit);
   if(appliedRoto)applyRotoscopeEffect(ctx,w,h,appliedRoto);
+  if(appliedIR)applyInfraredEffect(ctx,w,h,appliedIR);
+  if(appliedHeat)applyHeatmapEffect(ctx,w,h,appliedHeat);
+  if(appliedNeg)applyNegativeEffect(ctx,w,h,appliedNeg);
 }
 function anyEffectActive(){
-  return!!(applied8bit||appliedFps||appliedRoto);
+  return!!(applied8bit||appliedFps||appliedRoto||appliedIR||appliedHeat||appliedNeg);
 }
 function renderPreview(){
   if(!anyEffectActive()||!vid.src)return;
@@ -795,23 +1081,66 @@ function startPreviewLoop(){
 function onBit8(){
   bit8Settings.pixelSize=+document.getElementById('bit8PxR').value;
   bit8Settings.colorLevels=+document.getElementById('bit8ColR').value;
+  bit8Settings.duoStrength=+document.getElementById('bit8DuoR').value;
+  bit8Settings.shadowColor=document.getElementById('bit8ShadowC').value;
+  bit8Settings.highlightColor=document.getElementById('bit8HighC').value;
   document.getElementById('bit8PxV').textContent=bit8Settings.pixelSize+'px';
   document.getElementById('bit8ColV').textContent=bit8Settings.colorLevels;
+  document.getElementById('bit8DuoV').textContent=bit8Settings.duoStrength>0?bit8Settings.duoStrength+'%':'Off';
+  if(!bit8ApplyingPreset){
+    // Manual tweak after picking a style preset — fall back to Custom
+    // (fixed palettes like Game Boy/CGA/C64 no longer apply once you touch a slider).
+    document.getElementById('bit8Style').value='custom';
+    bit8Settings.paletteKey=null;
+    setBit8ControlsLocked(false);
+  }
+}
+function setBit8ControlsLocked(locked){
+  ['bit8ColR','bit8DuoR','bit8ShadowC','bit8HighC'].forEach(id=>document.getElementById(id).disabled=locked);
+}
+function onBit8Style(){
+  const key=document.getElementById('bit8Style').value;
+  if(key==='custom'){
+    bit8Settings.paletteKey=null;
+    setBit8ControlsLocked(false);
+    return;
+  }
+  const p=BIT8_PRESETS[key];
+  bit8ApplyingPreset=true;
+  document.getElementById('bit8PxR').value=p.pixelSize;
+  document.getElementById('bit8ColR').value=p.colorLevels;
+  document.getElementById('bit8DuoR').value=p.duoStrength;
+  document.getElementById('bit8ShadowC').value=p.shadowColor;
+  document.getElementById('bit8HighC').value=p.highlightColor;
+  onBit8();
+  bit8Settings.paletteKey=p.palette||null;
+  setBit8ControlsLocked(!!p.palette);
+  bit8ApplyingPreset=false;
 }
 function doApply8bit(){
   applied8bit={...bit8Settings};
-  document.getElementById('bit8S').textContent=applied8bit.pixelSize+'px · '+applied8bit.colorLevels+' colors';
+  const styleSel=document.getElementById('bit8Style');
+  const styleName=styleSel.options[styleSel.selectedIndex].text.split(' (')[0];
+  let desc=(styleSel.value!=='custom'?styleName+' · ':'')+applied8bit.pixelSize+'px';
+  desc+=applied8bit.paletteKey?' · fixed palette':' · '+applied8bit.colorLevels+' colors'+(applied8bit.duoStrength>0&&styleSel.value==='custom'?' · duotone':'');
+  document.getElementById('bit8S').textContent=desc;
   startPreviewLoop();
   flash('ap8bit','8-bit effect applied');
   showProc('Applying 8-bit effect…',600);
 }
 function reset8bit(){
   applied8bit=null;
-  bit8Settings={pixelSize:8,colorLevels:8};
+  bit8Settings={pixelSize:8,colorLevels:8,duoStrength:0,shadowColor:'#1a1a2e',highlightColor:'#ffe66d',paletteKey:null};
+  document.getElementById('bit8Style').value='custom';
+  setBit8ControlsLocked(false);
   document.getElementById('bit8PxR').value=8;
   document.getElementById('bit8ColR').value=8;
+  document.getElementById('bit8DuoR').value=0;
+  document.getElementById('bit8ShadowC').value='#1a1a2e';
+  document.getElementById('bit8HighC').value='#ffe66d';
   document.getElementById('bit8PxV').textContent='8px';
   document.getElementById('bit8ColV').textContent='8';
+  document.getElementById('bit8DuoV').textContent='Off';
   document.getElementById('bit8S').textContent='Pixelated retro look';
   lastDrawnMediaTime=-1;
   startPreviewLoop();
@@ -819,24 +1148,120 @@ function reset8bit(){
 function onRoto(){
   rotoSettings.threshold=+document.getElementById('rotoEdgeR').value;
   rotoSettings.colorLevels=+document.getElementById('rotoColR').value;
+  rotoSettings.lineColor=document.getElementById('rotoLineC').value;
+  rotoSettings.fillColor=document.getElementById('rotoFillC').value;
+  rotoSettings.fillStrength=+document.getElementById('rotoFillR').value;
   document.getElementById('rotoEdgeV').textContent=rotoSettings.threshold;
   document.getElementById('rotoColV').textContent=rotoSettings.colorLevels;
+  document.getElementById('rotoFillV').textContent=rotoSettings.fillStrength>0?rotoSettings.fillStrength+'%':'Off';
 }
 function doApplyRoto(){
   appliedRoto={...rotoSettings};
-  document.getElementById('rotoS').textContent='Edge '+appliedRoto.threshold+' · '+appliedRoto.colorLevels+' colors';
+  document.getElementById('rotoS').textContent='Edge '+appliedRoto.threshold+' · '+appliedRoto.colorLevels+' colors'+(appliedRoto.fillStrength>0?' · tinted':'');
   startPreviewLoop();
   flash('apRoto','Rotoscope applied');
   showProc('Applying rotoscope…',600);
 }
 function resetRoto(){
   appliedRoto=null;
-  rotoSettings={threshold:50,colorLevels:5};
+  rotoSettings={threshold:50,colorLevels:5,lineColor:'#121212',fillColor:'#ff5470',fillStrength:0};
   document.getElementById('rotoEdgeR').value=50;
   document.getElementById('rotoColR').value=5;
+  document.getElementById('rotoLineC').value='#121212';
+  document.getElementById('rotoFillC').value='#ff5470';
+  document.getElementById('rotoFillR').value=0;
   document.getElementById('rotoEdgeV').textContent='50';
   document.getElementById('rotoColV').textContent='5';
+  document.getElementById('rotoFillV').textContent='Off';
   document.getElementById('rotoS').textContent='Traced cartoon outline look';
+  lastDrawnMediaTime=-1;
+  startPreviewLoop();
+}
+function onIR(){
+  irSettings.intensity=+document.getElementById('irIntR').value;
+  irSettings.threshold=+document.getElementById('irThrR').value;
+  irSettings.shadowColor=document.getElementById('irShadowC').value;
+  irSettings.highlightColor=document.getElementById('irHighC').value;
+  document.getElementById('irIntV').textContent=irSettings.intensity+'%';
+  document.getElementById('irThrV').textContent=irSettings.threshold;
+}
+function doApplyIR(){
+  appliedIR={...irSettings};
+  document.getElementById('irS').textContent=appliedIR.intensity+'% intensity · white pt '+appliedIR.threshold;
+  lastDrawnMediaTime=-1;
+  startPreviewLoop();
+  flash('apIR','Infrared effect applied');
+  showProc('Applying infrared…',600);
+}
+function resetIR(){
+  appliedIR=null;
+  irSettings={intensity:100,threshold:50,shadowColor:'#1a0505',highlightColor:'#ffccdd'};
+  document.getElementById('irIntR').value=100;
+  document.getElementById('irThrR').value=50;
+  document.getElementById('irShadowC').value='#1a0505';
+  document.getElementById('irHighC').value='#ffccdd';
+  document.getElementById('irIntV').textContent='100%';
+  document.getElementById('irThrV').textContent='50';
+  document.getElementById('irS').textContent='False-color IR look';
+  lastDrawnMediaTime=-1;
+  startPreviewLoop();
+}
+function onHeat(){
+  heatSettings.palette=document.getElementById('heatPal').value;
+  heatSettings.sensitivity=+document.getElementById('heatSensR').value;
+  heatSettings.coldColor=document.getElementById('heatColdC').value;
+  heatSettings.midColor=document.getElementById('heatMidC').value;
+  heatSettings.hotColor=document.getElementById('heatHotC').value;
+  document.getElementById('heatSensV').textContent=heatSettings.sensitivity;
+  document.getElementById('heatCustomRow').style.display=heatSettings.palette==='custom'?'':'none';
+}
+function doApplyHeat(){
+  appliedHeat={...heatSettings};
+  const palLabel=document.getElementById('heatPal').selectedOptions[0].textContent.split(' (')[0].replace('…','');
+  document.getElementById('heatS').textContent=palLabel+' · sensitivity '+appliedHeat.sensitivity;
+  lastDrawnMediaTime=-1;
+  startPreviewLoop();
+  flash('apHeat','Heat map applied');
+  showProc('Applying heat map…',600);
+}
+function resetHeat(){
+  appliedHeat=null;
+  heatSettings={palette:'classic',sensitivity:50,coldColor:'#0a0a2a',midColor:'#ff2e63',hotColor:'#ffec3d'};
+  document.getElementById('heatPal').value='classic';
+  document.getElementById('heatSensR').value=50;
+  document.getElementById('heatColdC').value='#0a0a2a';
+  document.getElementById('heatMidC').value='#ff2e63';
+  document.getElementById('heatHotC').value='#ffec3d';
+  document.getElementById('heatSensV').textContent='50';
+  document.getElementById('heatCustomRow').style.display='none';
+  document.getElementById('heatS').textContent='Thermal-camera style';
+  lastDrawnMediaTime=-1;
+  startPreviewLoop();
+}
+function onNeg(){
+  negSettings.intensity=+document.getElementById('negIntR').value;
+  negSettings.tintColor=document.getElementById('negTintC').value;
+  negSettings.tintStrength=+document.getElementById('negTintR').value;
+  document.getElementById('negIntV').textContent=negSettings.intensity+'%';
+  document.getElementById('negTintV').textContent=negSettings.tintStrength>0?negSettings.tintStrength+'%':'Off';
+}
+function doApplyNeg(){
+  appliedNeg={...negSettings};
+  document.getElementById('negS').textContent=appliedNeg.intensity+'% inverted'+(appliedNeg.tintStrength>0?' · tinted':'');
+  lastDrawnMediaTime=-1;
+  startPreviewLoop();
+  flash('apNeg','Negative applied');
+  showProc('Applying negative…',600);
+}
+function resetNeg(){
+  appliedNeg=null;
+  negSettings={intensity:100,tintColor:'#ff3366',tintStrength:0};
+  document.getElementById('negIntR').value=100;
+  document.getElementById('negTintC').value='#ff3366';
+  document.getElementById('negTintR').value=0;
+  document.getElementById('negIntV').textContent='100%';
+  document.getElementById('negTintV').textContent='Off';
+  document.getElementById('negS').textContent='Inverted colors';
   lastDrawnMediaTime=-1;
   startPreviewLoop();
 }
